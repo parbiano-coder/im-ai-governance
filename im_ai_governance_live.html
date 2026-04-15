@@ -1,0 +1,2167 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>iM AI Governance Management</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=IBM+Plex+Mono:wght@400;600&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary:#0A3D91; --primary-l:#1155CC; --accent:#FF6B00;
+  --green:#00C9A7; --yellow:#F5A623; --red:#E8453C;
+  --bg:#F2F5FA; --surface:#fff; --surface2:#EEF1F8;
+  --text:#0D1B2A; --muted:#5A6A80; --border:#D4DCE8;
+  --sw:248px; --hh:58px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);display:flex;height:100vh;overflow:hidden;}
+
+/* ── SIDEBAR ── */
+.sidebar{width:var(--sw);background:var(--primary);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;}
+.logo{padding:18px 16px 14px;border-bottom:1px solid rgba(255,255,255,.1);}
+.logo .brand{font-family:'Bebas Neue',sans-serif;font-size:15px;color:#fff;letter-spacing:.5px;}
+.logo .sub{font-size:9px;color:rgba(255,255,255,.45);margin-top:3px;line-height:1.5;}
+.logo .live-badge{display:inline-block;background:var(--green);color:#fff;font-size:8px;font-weight:700;padding:1px 6px;border-radius:10px;margin-top:4px;letter-spacing:.5px;}
+.sec-label{font-size:9px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1.8px;padding:14px 16px 5px;text-transform:uppercase;}
+.nav{display:flex;align-items:center;gap:9px;padding:8px 16px;color:rgba(255,255,255,.7);font-size:12.5px;cursor:pointer;border-left:3px solid transparent;transition:all .13s;}
+.nav:hover{background:rgba(255,255,255,.08);color:#fff;}
+.nav.active{background:rgba(255,255,255,.13);color:#fff;border-left-color:var(--accent);font-weight:500;}
+.nav .ic{font-size:14px;width:17px;text-align:center;}
+.sidebar-ft{margin-top:auto;padding:12px 16px;border-top:1px solid rgba(255,255,255,.1);font-size:10px;color:rgba(255,255,255,.3);line-height:1.6;}
+
+/* ── MAIN ── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.topbar{height:var(--hh);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 22px;gap:10px;flex-shrink:0;}
+.topbar h1{font-size:14.5px;font-weight:700;}
+.topbar .bc{font-size:11px;color:var(--muted);}
+.topbar .sp{flex:1;}
+.badge{font-size:9.5px;font-weight:700;padding:3px 8px;border-radius:20px;}
+.badge-blue{background:#E8F0FE;color:var(--primary);}
+.badge-live{background:#E6FAF5;color:#065f46;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+.av{width:28px;height:28px;border-radius:50%;background:var(--primary);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+.content{flex:1;overflow-y:auto;padding:18px 22px;display:flex;flex-direction:column;gap:14px;}
+
+/* ── PAGES ── */
+.page{display:none;flex-direction:column;gap:14px;}
+.page.active{display:flex;}
+
+/* ── LAYOUT ── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+.g73{display:grid;grid-template-columns:7fr 3fr;gap:12px;}
+.g64{display:grid;grid-template-columns:6fr 4fr;gap:12px;}
+
+/* ── CARDS ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 18px;}
+.card-title{font-size:12.5px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:7px;flex-wrap:wrap;}
+.law{font-family:'IBM Plex Mono',monospace;font-size:9px;background:#E8F0FE;color:var(--primary);padding:2px 6px;border-radius:4px;font-weight:600;}
+
+/* ── STAT ── */
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;border-left:4px solid var(--primary);}
+.stat.o{border-left-color:var(--accent);}
+.stat.g{border-left-color:var(--green);}
+.stat.r{border-left-color:var(--red);}
+.stat-label{font-size:10.5px;color:var(--muted);margin-bottom:5px;}
+.stat-val{font-size:26px;font-weight:900;line-height:1;}
+.stat-sub{font-size:10px;color:var(--muted);margin-top:4px;}
+
+/* ── RISK BADGES ── */
+.risk{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;}
+.r1{background:#E6FAF5;color:var(--green);}
+.r2{background:#FFF8E1;color:var(--yellow);}
+.r3{background:#FDECEA;color:var(--red);}
+
+/* ── TABLE ── */
+.tw{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:11.5px;}
+thead th{background:var(--surface2);padding:8px 11px;text-align:left;font-weight:700;font-size:10.5px;color:var(--muted);border-bottom:1px solid var(--border);}
+tbody td{padding:8px 11px;border-bottom:1px solid var(--border);vertical-align:middle;}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover{background:var(--bg);}
+
+/* ── CHECKLIST ── */
+.cl{display:flex;flex-direction:column;gap:5px;}
+.ci{display:flex;align-items:flex-start;gap:9px;padding:7px 10px;border-radius:6px;background:var(--surface2);font-size:11.5px;}
+.ci.done{background:#E6FAF5;}
+.ci.warn{background:#FFF8E1;}
+.ci.fail{background:#FDECEA;}
+.cb{width:16px;height:16px;border-radius:4px;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;}
+.cb.done{background:var(--green);color:#fff;}
+.cb.warn{background:var(--yellow);color:#fff;}
+.cb.fail{background:var(--red);color:#fff;}
+.cb.pend{background:var(--border);}
+.ct strong{display:block;font-weight:600;margin-bottom:2px;}
+.ct span{color:var(--muted);font-size:10.5px;}
+
+/* ── ALERTS ── */
+.alert{display:flex;align-items:flex-start;gap:9px;padding:9px 13px;border-radius:0;font-size:11.5px;border-left:3px solid;}
+.ai{background:#E8F0FE;color:var(--primary);border-color:var(--primary);}
+.aw{background:#FFF8E1;color:#856404;border-color:var(--yellow);}
+.as{background:#E6FAF5;color:#065f46;border-color:var(--green);}
+.ar{background:#FDECEA;color:#7B1919;border-color:var(--red);}
+
+/* ── BTNS ── */
+.btn{font-size:11.5px;font-weight:600;padding:7px 13px;border-radius:6px;border:none;cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:opacity .15s;}
+.btn:hover{opacity:.85;}
+.btn-p{background:var(--primary);color:#fff;}
+.btn-a{background:var(--accent);color:#fff;}
+.btn-o{background:transparent;border:1px solid var(--border);color:var(--text);}
+.btn-g{background:var(--green);color:#fff;}
+.btn-sm{padding:4px 9px;font-size:10.5px;}
+.btn:disabled{opacity:.4;cursor:not-allowed;}
+
+/* ── PROGRESS ── */
+.pb{height:5px;border-radius:3px;background:var(--surface2);overflow:hidden;margin-top:5px;}
+.pf{height:100%;border-radius:3px;}
+
+/* ── GAUGE ── */
+.gr{display:flex;flex-direction:column;gap:7px;}
+.gi{display:flex;flex-direction:column;gap:3px;}
+.glr{display:flex;justify-content:space-between;font-size:10.5px;}
+
+/* ── TABS ── */
+.tabs{display:flex;border-bottom:2px solid var(--border);margin-bottom:14px;}
+.tab{padding:7px 14px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;}
+.tab.active{color:var(--primary);border-bottom-color:var(--primary);}
+
+/* ── FORM ELEMENTS ── */
+input[type=text],input[type=email],textarea,select{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;font-family:'Noto Sans KR',sans-serif;outline:none;background:var(--surface);color:var(--text);}
+input[type=text]:focus,textarea:focus,select:focus{border-color:var(--primary);}
+textarea{resize:vertical;min-height:80px;}
+label{font-size:11px;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;}
+
+/* ── AI CHAT PANEL ── */
+.ai-panel{background:var(--primary);border-radius:10px;padding:16px 18px;color:#fff;display:flex;flex-direction:column;gap:10px;}
+.ai-title{font-size:13px;font-weight:700;display:flex;align-items:center;gap:7px;}
+.ai-badge{background:var(--accent);color:#fff;font-size:9px;padding:2px 6px;border-radius:4px;font-weight:700;}
+.ai-live{background:var(--green);color:#fff;font-size:9px;padding:2px 6px;border-radius:4px;font-weight:700;}
+.ai-msgs{display:flex;flex-direction:column;gap:7px;max-height:340px;overflow-y:auto;flex:1;}
+.ai-msg{font-size:11.5px;line-height:1.65;padding:8px 11px;border-radius:7px;}
+.ai-msg.bot{background:rgba(255,255,255,.12);}
+.ai-msg.user{background:rgba(255,255,255,.07);align-self:flex-end;max-width:85%;}
+.ai-msg .lbl{font-size:9.5px;font-weight:700;margin-bottom:3px;color:rgba(255,255,255,.55);}
+.ai-typing{display:flex;gap:4px;padding:8px 11px;}
+.ai-typing span{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.5);animation:dot .8s infinite;}
+.ai-typing span:nth-child(2){animation-delay:.2s;}
+.ai-typing span:nth-child(3){animation-delay:.4s;}
+@keyframes dot{0%,60%,100%{transform:scale(1)}30%{transform:scale(1.4)}}
+.ai-input-row{display:flex;gap:7px;}
+.ai-inp{flex:1;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:6px;padding:7px 11px;font-size:11.5px;color:#fff;font-family:'Noto Sans KR',sans-serif;outline:none;}
+.ai-inp::placeholder{color:rgba(255,255,255,.38);}
+.ai-inp:disabled{opacity:.5;}
+.ai-send{background:var(--accent);border:none;border-radius:6px;padding:7px 13px;color:#fff;font-size:14px;cursor:pointer;font-weight:700;}
+.ai-send:disabled{opacity:.4;cursor:not-allowed;}
+
+/* ── TOKEN SETUP ── */
+.token-setup{background:var(--surface);border:2px dashed var(--border);border-radius:10px;padding:24px;text-align:center;}
+.token-setup h2{font-size:16px;font-weight:700;margin-bottom:8px;}
+.token-setup p{font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.6;}
+.token-row{display:flex;gap:8px;max-width:500px;margin:0 auto;}
+
+/* ── REPORT ── */
+.report-preview{background:var(--surface2);border-radius:8px;padding:14px;font-size:12px;line-height:1.8;border-left:3px solid var(--primary);white-space:pre-wrap;font-family:'IBM Plex Mono',monospace;font-size:11px;max-height:300px;overflow-y:auto;}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+
+.mono{font-family:'IBM Plex Mono',monospace;}
+.chip{display:inline-block;font-size:10px;padding:1px 7px;border-radius:20px;border:1px solid var(--border);color:var(--muted);background:var(--surface2);}
+
+/* ── STEP FLOW ── */
+.steps{display:flex;overflow-x:auto;padding:2px 0 6px;gap:0;}
+.step{flex:1;min-width:80px;text-align:center;position:relative;}
+.step::after{content:'›';position:absolute;right:-5px;top:9px;font-size:18px;color:var(--border);}
+.step:last-child::after{display:none;}
+.sCircle{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 5px;font-size:12px;border:2px solid;}
+.sCircle.done{background:var(--green);border-color:var(--green);color:#fff;}
+.sCircle.act{background:var(--primary);border-color:var(--primary);color:#fff;}
+.sCircle.warn{background:var(--yellow);border-color:var(--yellow);color:#fff;}
+.sCircle.idle{background:var(--surface2);border-color:var(--border);color:var(--muted);}
+.sLabel{font-size:9.5px;font-weight:600;color:var(--text);}
+.sSub{font-size:8.5px;color:var(--muted);margin-top:1px;}
+
+/* ── MENU BANNER ── */
+.menu-banner{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 20px;border-left:4px solid var(--primary);display:flex;align-items:flex-start;gap:16px;}
+.menu-banner.orange{border-left-color:var(--accent);}
+.menu-banner.green{border-left-color:var(--green);}
+.menu-banner.purple{border-left-color:#7C3AED;}
+.menu-banner.teal{border-left-color:#0891B2;}
+.menu-banner.rose{border-left-color:#E11D48;}
+.menu-banner .mb-icon{font-size:28px;flex-shrink:0;margin-top:2px;}
+.menu-banner .mb-body{flex:1;}
+.menu-banner .mb-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;}
+.menu-banner .mb-desc{font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:8px;}
+.menu-banner .mb-chips{display:flex;flex-wrap:wrap;gap:5px;}
+.menu-banner .mb-chip{font-size:10px;font-weight:600;padding:2px 9px;border-radius:20px;background:var(--surface2);color:var(--text);border:1px solid var(--border);}
+.menu-banner .mb-chip.blue{background:#E8F0FE;color:var(--primary);border-color:#B5D4F4;}
+.menu-banner .mb-chip.orange{background:#FFF3E0;color:#C05600;border-color:#FFD9A0;}
+.menu-banner .mb-chip.green{background:#E6FAF5;color:#065f46;border-color:#9FE1CB;}
+.menu-banner .mb-chip.purple{background:#F3F0FF;color:#5B21B6;border-color:#C4B5FD;}
+.menu-banner .mb-steps{display:flex;align-items:center;gap:4px;margin-top:8px;flex-wrap:wrap;}
+.menu-banner .mb-step{font-size:10px;font-weight:600;padding:3px 10px;border-radius:4px;background:var(--surface2);border:1px solid var(--border);color:var(--text);}
+.menu-banner .mb-step-arrow{color:var(--border);font-size:12px;}
+
+/* ── FILE UPLOAD ZONE ── */
+.drop-zone{border:2px dashed var(--border);border-radius:10px;padding:32px;text-align:center;cursor:pointer;transition:all .2s;background:var(--surface);}
+.drop-zone:hover,.drop-zone.drag{border-color:var(--primary);background:#E8F0FE;}
+.drop-zone .dz-icon{font-size:36px;margin-bottom:10px;}
+.drop-zone .dz-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;}
+.drop-zone .dz-sub{font-size:11.5px;color:var(--muted);}
+.drop-zone .dz-types{font-size:10.5px;color:var(--muted);margin-top:8px;background:var(--surface2);display:inline-block;padding:3px 10px;border-radius:20px;}
+.file-item{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--surface2);border-radius:7px;font-size:12px;}
+.file-item .fi-icon{font-size:18px;flex-shrink:0;}
+.file-item .fi-name{font-weight:600;flex:1;}
+.file-item .fi-size{color:var(--muted);font-size:10.5px;}
+.file-item .fi-remove{cursor:pointer;color:var(--red);font-size:14px;padding:0 4px;}
+.risk-result-card{border-radius:10px;padding:18px;border:2px solid;}
+.risk-result-card.high{background:#FEF2F2;border-color:var(--red);}
+.risk-result-card.mid{background:#FFFBEB;border-color:var(--yellow);}
+.risk-result-card.low{background:#ECFDF5;border-color:var(--green);}
+.nine-risk-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:10px;}
+.nine-risk-item{padding:8px 10px;border-radius:7px;font-size:11px;border-left:3px solid;}
+.nine-risk-item.detected{background:#FDECEA;border-color:var(--red);}
+.nine-risk-item.warn{background:#FFF8E1;border-color:var(--yellow);}
+.nine-risk-item.ok{background:#E6FAF5;border-color:var(--green);}
+.nine-risk-item .ri-name{font-weight:700;margin-bottom:2px;}
+.nine-risk-item .ri-desc{color:var(--muted);font-size:10px;line-height:1.4;}
+.progress-bar-anim{height:6px;border-radius:3px;background:var(--surface2);overflow:hidden;margin:6px 0;}
+.progress-bar-anim .fill{height:100%;border-radius:3px;transition:width 1s ease;}
+.stream-output{font-size:11.5px;line-height:1.75;white-space:pre-wrap;color:var(--text);max-height:400px;overflow-y:auto;padding:14px;background:var(--surface2);border-radius:8px;border-left:3px solid var(--primary);}
+
+.tl{display:flex;flex-direction:column;}
+.tli{display:flex;gap:11px;padding-bottom:13px;position:relative;}
+.tli::before{content:'';position:absolute;left:14px;top:27px;bottom:0;width:1px;background:var(--border);}
+.tli:last-child::before{display:none;}
+.tldot{width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;z-index:1;}
+.tlc .tldate{font-size:9.5px;color:var(--muted);font-family:'IBM Plex Mono',monospace;margin-bottom:2px;}
+.tlc .tlt{font-size:11.5px;font-weight:700;margin-bottom:2px;}
+.tlc .tld{font-size:10.5px;color:var(--muted);}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="logo">
+    <div class="brand">iM AI Governance Management</div>
+    <div class="sub">AI기본법 준거<br>AI 위험관리 플랫폼</div>
+    <div class="live-badge">● LIVE SERVICE</div>
+  </div>
+  <div class="sec-label">주요 메뉴</div>
+  <div class="nav active" onclick="showPage('dashboard')"><span class="ic">📊</span> 거버넌스 대시보드</div>
+  <div class="nav" onclick="showPage('register')"><span class="ic">➕</span> AI 서비스 등록</div>
+  <div class="nav" onclick="showPage('docreview')"><span class="ic">📂</span> 문서 위험평가 분석</div>
+  <div class="nav" onclick="showPage('checklist')"><span class="ic">✅</span> 위험평가 체크리스트</div>
+  <div class="nav" onclick="showPage('report')"><span class="ic">📄</span> 보고서 자동 생성</div>
+  <div class="nav" onclick="showPage('monitor')"><span class="ic">📡</span> 실시간 모니터링</div>
+  <div class="sec-label">AI 어시스턴트</div>
+  <div class="nav" onclick="showPage('assistant')"><span class="ic">🤖</span> AI 거버넌스 어시스턴트</div>
+  <div class="sec-label">설정</div>
+  <div class="nav" onclick="showPage('settings')"><span class="ic">⚙️</span> API 키 설정</div>
+  <div class="sidebar-ft">
+    iM AI Governance Management v3.0<br>
+    Claude API 실시간 연동
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div>
+      <h1 id="page-title">거버넌스 대시보드</h1>
+      <div class="bc" id="page-bc">홈 / 대시보드</div>
+    </div>
+    <span class="badge badge-blue">AI기본법 준거</span>
+    <span class="badge badge-live" id="api-status-badge">⬤ API 미연결</span>
+    <div class="sp"></div>
+    <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);">
+      <div class="av">김</div><span>김담당 | AI 거버넌스 주관부서</span>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ════════ PAGE: DASHBOARD ════════ -->
+    <div class="page active" id="page-dashboard">
+      <div class="menu-banner">
+        <div class="mb-icon">📊</div>
+        <div class="mb-body">
+          <div class="mb-title">거버넌스 대시보드</div>
+          <div class="mb-desc">iM AI Governance Management에서 전체 AI 서비스의 위험관리 현황을 한눈에 파악할 수 있습니다. 등록된 AI 서비스의 위험등급별 분포, 체크리스트 진행 상태, 보완 필요 알림을 실시간으로 확인하고 빠른 작업으로 주요 기능에 즉시 접근하세요.</div>
+          <div class="mb-chips">
+            <span class="mb-chip blue">AI기본법 준거</span>
+            <span class="mb-chip green">실시간 현황</span>
+            <span class="mb-chip orange">AI 자동 알림</span>
+          </div>
+        </div>
+      </div>
+      <div id="api-warning" class="alert aw" style="display:none;">
+        <span>⚠</span>
+        <div>Claude API 키가 설정되지 않았습니다. <strong style="cursor:pointer;text-decoration:underline" onclick="showPage('settings')">설정 페이지</strong>에서 API 키를 입력하면 AI 어시스턴트가 실제로 동작합니다.</div>
+      </div>
+      <div class="g4">
+        <div class="stat"><div class="stat-label">등록 AI 서비스</div><div class="stat-val" id="dash-total">0</div><div class="stat-sub">로컬 저장 기준</div></div>
+        <div class="stat o"><div class="stat-label">검토 진행 중</div><div class="stat-val" id="dash-ongoing">0</div><div class="stat-sub">체크리스트 미완료</div></div>
+        <div class="stat g"><div class="stat-label">승인 완료</div><div class="stat-val" id="dash-done">0</div><div class="stat-sub">전 항목 통과</div></div>
+        <div class="stat r"><div class="stat-label">보완 필요</div><div class="stat-val" id="dash-warn">0</div><div class="stat-sub">즉시 조치 요망</div></div>
+      </div>
+      <div class="g73">
+        <div class="card">
+          <div class="card-title">등록된 AI 서비스 현황</div>
+          <div class="tw">
+            <table id="service-table">
+              <thead><tr><th>서비스명</th><th>유형</th><th>위험등급</th><th>생애주기</th><th>체크리스트</th><th>상태</th><th>작업</th></tr></thead>
+              <tbody id="service-tbody">
+                <tr><td colspan="7" style="text-align:center;color:var(--muted);padding:20px;">등록된 서비스가 없습니다. AI 서비스 등록 메뉴에서 추가하세요.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="card">
+            <div class="card-title">빠른 작업</div>
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <button class="btn btn-p" style="width:100%" onclick="showPage('register')">➕ 새 AI 서비스 등록</button>
+              <button class="btn btn-a" style="width:100%" onclick="showPage('assistant')">🤖 AI 어시스턴트 열기</button>
+              <button class="btn btn-o" style="width:100%" onclick="showPage('report')">📄 보고서 생성</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">AI 9대 위험 현황</div>
+            <div id="risk9-summary" style="font-size:11.5px;color:var(--muted);text-align:center;padding:10px 0;">
+              서비스 등록 후 위험 현황이 표시됩니다.
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">AI 생애주기별 위험관리 프로세스 <span class="law">AI 거버넌스 매뉴얼 III장</span></div>
+        <div class="steps">
+          <div class="step"><div class="sCircle done">✓</div><div class="sLabel">사업계획 수립</div><div class="sSub">소관부서(기획)</div></div>
+          <div class="step"><div class="sCircle done">✓</div><div class="sLabel">위험등급 분류</div><div class="sSub">AI기본법 기준</div></div>
+          <div class="step"><div class="sCircle act">◎</div><div class="sLabel">위험평가(기획)</div><div class="sSub">체크리스트</div></div>
+          <div class="step"><div class="sCircle warn">!</div><div class="sLabel">위험완화 계획</div><div class="sSub">보완 조치</div></div>
+          <div class="step"><div class="sCircle idle">5</div><div class="sLabel">개발·학습</div><div class="sSub">소관부서(개발)</div></div>
+          <div class="step"><div class="sCircle idle">6</div><div class="sLabel">위험평가(개발)</div><div class="sSub">9대 위험</div></div>
+          <div class="step"><div class="sCircle idle">7</div><div class="sLabel">평가·검증</div><div class="sSub">개발자 검증</div></div>
+          <div class="step"><div class="sCircle idle">8</div><div class="sLabel">제3자 검증</div><div class="sSub">고위험 필수</div></div>
+          <div class="step"><div class="sCircle idle">9</div><div class="sLabel">운영·모니터링</div><div class="sSub">상시 감시</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════ PAGE: REGISTER ════════ -->
+    <div class="page" id="page-register">
+      <div class="menu-banner orange">
+        <div class="mb-icon">➕</div>
+        <div class="mb-body">
+          <div class="mb-title">AI 서비스 등록</div>
+          <div class="mb-desc">새로운 AI 서비스를 시스템에 등록합니다. 서비스 기본 정보를 입력하면 AI기본법 제2조 기준 <strong>4요건(자율성·적응성·결과물·활용성)</strong>을 자동 검토하고, 고영향 AI 여부·생성형 AI 여부를 판단하여 <strong>위험등급(고위험/중위험/저위험)</strong>을 자동으로 산정합니다. 등록 이후 체크리스트 수행과 보고서 생성이 가능합니다.</div>
+          <div class="mb-steps">
+            <span class="mb-step">① 기본정보 입력</span><span class="mb-step-arrow">›</span>
+            <span class="mb-step">② AI 위험등급 자동 산정</span><span class="mb-step-arrow">›</span>
+            <span class="mb-step">③ 등록 완료</span><span class="mb-step-arrow">›</span>
+            <span class="mb-step">④ 체크리스트 수행</span>
+          </div>
+        </div>
+      </div>
+      <div class="g2">
+        <div class="card">
+          <div class="card-title">AI 서비스 신규 등록 <span class="law">AI기본법 제2조</span></div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div><label>서비스명 *</label><input type="text" id="reg-name" placeholder="예: iM 신용평가 AI"></div>
+            <div><label>서비스 분류 *</label>
+              <select id="reg-category">
+                <option value="">-- 선택 --</option>
+                <option>여신·신용평가 (고영향 AI)</option>
+                <option>채용·인사평가 (고영향 AI)</option>
+                <option>이상거래탐지 (FDS)</option>
+                <option>고객서비스·챗봇</option>
+                <option>마케팅·상품추천</option>
+                <option>내부업무 자동화</option>
+                <option>리스크관리</option>
+                <option>기타</option>
+              </select>
+            </div>
+            <div><label>AI 기술 유형</label>
+              <select id="reg-aitype">
+                <option>비생성형 AI (분류·예측·추천)</option>
+                <option>생성형 AI (LLM·이미지·음성)</option>
+              </select>
+            </div>
+            <div><label>사업자 유형</label>
+              <select id="reg-biztype">
+                <option>인공지능이용사업자 (외부 AI 활용)</option>
+                <option>인공지능개발사업자 (직접 개발)</option>
+              </select>
+            </div>
+            <div><label>현재 생애주기 단계</label>
+              <select id="reg-stage">
+                <option>기획</option><option>개발</option><option>평가·검증</option><option>운영</option>
+              </select>
+            </div>
+            <div><label>서비스 목적 및 설명</label>
+              <textarea id="reg-desc" placeholder="AI 서비스의 목적, 대상 이용자, 활용 데이터 등을 기재"></textarea>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:4px;">
+              <button class="btn btn-a" style="flex:1" onclick="autoGradeRisk()">🤖 AI 위험등급 자동 산정</button>
+              <button class="btn btn-p" onclick="registerService()">등록</button>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="card" id="grade-result">
+            <div class="card-title">🤖 AI 위험등급 산정 결과</div>
+            <div style="text-align:center;padding:20px 0;color:var(--muted);font-size:12px;">
+              서비스 정보 입력 후 자동 산정 버튼을 클릭하세요.
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">AI 서비스 여부 4요건 <span class="law">AI기본법 제2조</span></div>
+            <div class="cl">
+              <div class="ci"><div class="cb done">✓</div><div class="ct"><strong>① 자율성</strong><span>독립적 데이터 학습·판단 운용 가능</span></div></div>
+              <div class="ci"><div class="cb done">✓</div><div class="ct"><strong>② 적응성</strong><span>기계학습 기반 자가학습·행동수정 가능</span></div></div>
+              <div class="ci"><div class="cb done">✓</div><div class="ct"><strong>③ 결과물(추론기반)</strong><span>예측·추천·결정·생성 중 하나 해당</span></div></div>
+              <div class="ci"><div class="cb done">✓</div><div class="ct"><strong>④ 활용성</strong><span>금융서비스·내부통제·채용 등 활용</span></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════ PAGE: CHECKLIST ════════ -->
+    <div class="page" id="page-checklist">
+      <div class="menu-banner green">
+        <div class="mb-icon">✅</div>
+        <div class="mb-body">
+          <div class="mb-title">위험평가 체크리스트</div>
+          <div class="mb-desc">AI기본법 및 금융분야 AI 개발·활용 안내서 기준의 위험평가 체크리스트를 <strong>기획·개발·운영 3단계</strong>로 수행합니다. 서비스의 위험등급(고위험/중위험/저위험)에 맞는 항목이 자동 필터링되며, 평가 결과(Y/N/보완필요/N/A)를 선택하면 즉시 저장됩니다. 완료 후 AI 검토의견 받기로 Claude AI의 종합 평가를 받을 수 있습니다.</div>
+          <div class="mb-chips">
+            <span class="mb-chip blue">AI기본법 제34조 — 사업자 책무</span>
+            <span class="mb-chip purple">기획·개발·운영 3단계</span>
+            <span class="mb-chip green">결과 자동 저장</span>
+            <span class="mb-chip orange">AI 검토의견</span>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">평가 대상 서비스 선택</div>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <select id="cl-service-select" style="flex:1" onchange="loadChecklist()">
+            <option value="">-- 서비스 선택 --</option>
+          </select>
+          <select id="cl-stage-select" style="width:140px" onchange="loadChecklist()">
+            <option value="기획">기획 단계</option>
+            <option value="개발">개발 단계</option>
+            <option value="운영">운영 단계</option>
+          </select>
+          <button class="btn btn-a btn-sm" onclick="generateAIChecklist()">🤖 AI 체크리스트 생성</button>
+        </div>
+      </div>
+      <div id="checklist-area">
+        <div class="card" style="text-align:center;padding:30px;color:var(--muted);">
+          서비스를 선택하고 AI 체크리스트 생성 버튼을 클릭하세요.
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════ PAGE: REPORT ════════ -->
+    <div class="page" id="page-report">
+      <div class="menu-banner purple">
+        <div class="mb-icon">📄</div>
+        <div class="mb-body">
+          <div class="mb-title">보고서 자동 생성</div>
+          <div class="mb-desc">등록된 AI 서비스의 위험평가 체크리스트 결과를 바탕으로 Claude AI가 공식 보고서를 실시간으로 작성합니다. <strong>위험평가 심사 의견서, AI 위험완화 계획서, 운영 단계 모니터링 보고서, AI 서비스 등록 요약서</strong> 4종을 지원하며, AI기본법 관련 조항이 자동으로 인용됩니다. 생성된 보고서는 복사하거나 TXT 파일로 다운로드할 수 있습니다.</div>
+          <div class="mb-chips">
+            <span class="mb-chip purple">4종 보고서 지원</span>
+            <span class="mb-chip blue">법령 자동 인용</span>
+            <span class="mb-chip green">Claude AI 실시간 작성</span>
+            <span class="mb-chip orange">TXT 다운로드</span>
+          </div>
+        </div>
+      </div>
+      <div class="g2">
+        <div class="card">
+          <div class="card-title">📄 보고서 자동 생성 <span class="law">AI 거버넌스 매뉴얼</span></div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div><label>대상 서비스</label>
+              <select id="rpt-service"><option value="">-- 선택 --</option></select>
+            </div>
+            <div><label>보고서 유형</label>
+              <select id="rpt-type">
+                <option value="위험평가 심사 의견서">위험평가 심사 의견서</option>
+                <option value="AI 위험완화 계획서">AI 위험완화 계획서</option>
+                <option value="운영 단계 모니터링 보고서">운영 단계 모니터링 보고서</option>
+                <option value="AI 서비스 등록 요약서">AI 서비스 등록 요약서</option>
+              </select>
+            </div>
+            <div><label>수신 부서</label>
+              <input type="text" id="rpt-receiver" placeholder="예: AI 거버넌스 주관부서 / 준법감시부"></div>
+            <div><label>추가 요청사항 (선택)</label>
+              <textarea id="rpt-notes" placeholder="특별히 강조할 사항이나 추가할 내용을 입력하세요."></textarea>
+            </div>
+            <button class="btn btn-a" onclick="generateReport()" id="rpt-btn">🤖 AI로 보고서 생성</button>
+          </div>
+        </div>
+        <div class="card" style="display:flex;flex-direction:column;gap:10px;">
+          <div class="card-title">생성된 보고서</div>
+          <div id="report-output" style="color:var(--muted);font-size:12px;text-align:center;padding:20px 0;">
+            보고서 생성 버튼을 클릭하면 Claude AI가 실시간으로 작성합니다.
+          </div>
+          <div style="display:flex;gap:7px;" id="report-actions" style="display:none;">
+            <button class="btn btn-o btn-sm" onclick="copyReport()">📋 복사</button>
+            <button class="btn btn-o btn-sm" onclick="downloadReport()">⬇️ TXT 다운로드</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════ PAGE: MONITOR ════════ -->
+    <div class="page" id="page-monitor">
+      <div class="menu-banner teal">
+        <div class="mb-icon">📡</div>
+        <div class="mb-body">
+          <div class="mb-title">실시간 모니터링</div>
+          <div class="mb-desc">등록된 모든 AI 서비스의 운영 상태를 실시간으로 추적합니다. 서비스별 위험등급, 체크리스트 이행 현황, 보완 조치 필요 여부를 한눈에 파악할 수 있습니다. <strong>AI기본법상 재평가 트리거</strong>(데이터 드리프트·규제 변화·기술 발전·사고 발생)가 감지되면 자동으로 알림이 표시됩니다. 새로고침으로 최신 상태를 확인하세요.</div>
+          <div class="mb-chips">
+            <span class="mb-chip blue">재평가 트리거 감지</span>
+            <span class="mb-chip green">서비스 상태 추적</span>
+            <span class="mb-chip orange">AI 자동 알림</span>
+          </div>
+        </div>
+      </div>
+      <div class="g4">
+        <div class="stat g"><div class="stat-label">정상 운영</div><div class="stat-val" id="mon-normal">-</div><div class="stat-sub">실시간 모니터링 중</div></div>
+        <div class="stat o"><div class="stat-label">재평가 필요</div><div class="stat-val" id="mon-review">-</div><div class="stat-sub">트리거 감지</div></div>
+        <div class="stat r"><div class="stat-label">보완 조치 중</div><div class="stat-val" id="mon-action">-</div><div class="stat-sub">즉시 조치 필요</div></div>
+        <div class="stat"><div class="stat-label">마지막 점검</div><div class="stat-val" style="font-size:16px;" id="mon-time">-</div><div class="stat-sub">자동 갱신</div></div>
+      </div>
+      <div class="g2">
+        <div class="card">
+          <div class="card-title">📡 서비스별 운영 현황</div>
+          <div class="tw">
+            <table id="monitor-table">
+              <thead><tr><th>서비스명</th><th>위험등급</th><th>마지막 평가</th><th>체크리스트</th><th>상태</th></tr></thead>
+              <tbody id="monitor-tbody">
+                <tr><td colspan="5" style="text-align:center;color:var(--muted);padding:20px;">등록된 서비스가 없습니다.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">📋 AI 자동 알림</div>
+          <div id="monitor-alerts" class="cl">
+            <div style="text-align:center;color:var(--muted);font-size:12px;padding:10px;">서비스 등록 후 알림이 표시됩니다.</div>
+          </div>
+          <div style="margin-top:12px;">
+            <button class="btn btn-o btn-sm" onclick="refreshMonitor()">🔄 새로고침</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════ PAGE: ASSISTANT ════════ -->
+    <div class="page" id="page-assistant">
+      <div class="menu-banner" style="border-left-color:#0A3D91;background:linear-gradient(135deg,#EEF1F8 0%,#E8F0FE 100%);">
+        <div class="mb-icon">🤖</div>
+        <div class="mb-body">
+          <div class="mb-title">AI 거버넌스 어시스턴트</div>
+          <div class="mb-desc">Claude AI가 <strong>AI기본법·금융분야 AI 안내서·iM 거버넌스 매뉴얼</strong>을 기반으로 AI 거버넌스 전반에 걸친 질문에 실시간으로 답변합니다. 체크리스트 항목 생성, 법령 해석, 위험등급 판단 기준, 위험완화 계획서 작성 등을 도움 받을 수 있습니다. API 키 설정 후 사용 가능합니다.</div>
+          <div class="mb-chips">
+            <span class="mb-chip blue">Claude AI 실시간 응답</span>
+            <span class="mb-chip blue">AI기본법 전문 지식</span>
+            <span class="mb-chip green">체크리스트 생성</span>
+            <span class="mb-chip purple">법령 해석·질의응답</span>
+          </div>
+        </div>
+      </div>
+      <div class="g64">
+        <div class="ai-panel" style="min-height:500px;">
+          <div class="ai-title">
+            🤖 AI 거버넌스 어시스턴트
+            <span class="ai-badge">CLAUDE</span>
+            <span class="ai-live" id="assistant-status">● 미연결</span>
+          </div>
+          <div style="font-size:10px;color:rgba(255,255,255,.45);">AI기본법·금융분야 AI 안내서·iM 거버넌스 매뉴얼 기반</div>
+          <div class="ai-msgs" id="chat-msgs">
+            <div class="ai-msg bot">
+              <div class="lbl">AI 어시스턴트</div>
+              안녕하세요! iM AI Governance Management 어시스턴트입니다.<br><br>
+              API 키를 설정하면 실제 Claude AI가 응답합니다. 체크리스트 자동 생성, 위험등급 분류, 보고서 초안 작성 등을 도와드립니다.<br><br>
+              설정 메뉴에서 Anthropic API 키를 입력해주세요.
+            </div>
+          </div>
+          <div class="ai-input-row">
+            <input class="ai-inp" id="chat-input" placeholder="AI기본법 관련 질문, 체크리스트 생성, 보고서 작성 등..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}" disabled>
+            <button class="ai-send" onclick="sendChat()" id="chat-send-btn" disabled>→</button>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="card">
+            <div class="card-title">⚡ 빠른 질문</div>
+            <div style="display:flex;flex-direction:column;gap:5px;">
+              <button class="btn btn-o btn-sm" style="text-align:left" onclick="quickChat('고위험 AI 기획단계 체크리스트 항목을 전체 작성해줘')">📋 고위험 AI 기획단계 체크리스트</button>
+              <button class="btn btn-o btn-sm" style="text-align:left" onclick="quickChat('AI기본법 제31조 투명성 의무 내용을 상세히 설명해줘')">⚖️ AI기본법 제31조 투명성 의무</button>
+              <button class="btn btn-o btn-sm" style="text-align:left" onclick="quickChat('대출심사 AI가 고영향 AI에 해당하는지 판단 기준을 설명해줘')">🏦 대출심사 AI 고영향 판단 기준</button>
+              <button class="btn btn-o btn-sm" style="text-align:left" onclick="quickChat('AI 9대 위험 유형별 금융서비스 적용 사례를 설명해줘')">🔍 AI 9대 위험 금융서비스 사례</button>
+              <button class="btn btn-o btn-sm" style="text-align:left" onclick="quickChat('생성형 AI 운영단계 모니터링 체크리스트를 작성해줘')">📡 생성형 AI 운영단계 모니터링</button>
+              <button class="btn btn-o btn-sm" style="text-align:left" onclick="quickChat('AI 위험완화 계획서 작성 방법과 필수 항목을 알려줘')">📝 AI 위험완화 계획서 작성법</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">대화 기록</div>
+            <div style="font-size:11px;color:var(--muted);" id="chat-history-summary">대화 없음</div>
+            <button class="btn btn-o btn-sm" style="margin-top:8px;width:100%" onclick="clearChat()">대화 초기화</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════ PAGE: DOCREVIEW ════════ -->
+    <div class="page" id="page-docreview">
+      <div class="menu-banner rose">
+        <div class="mb-icon">📂</div>
+        <div class="mb-body">
+          <div class="mb-title">문서 위험평가 분석</div>
+          <div class="mb-desc">AI 서비스 관련 초안 문서(기획서·제안서·요구사항 정의서·설계서 등)를 업로드하면 Claude AI가 <strong>AI기본법·금융분야 AI 안내서</strong> 기준으로 자동 위험평가를 수행합니다. 위험등급 판정, AI 9대 위험 항목별 분석, 법령 조항 매핑, GAP 분석 등 5가지 분석 유형을 제공하며, 결과는 <strong>전문 Word(.docx) 보고서</strong>로 즉시 다운로드할 수 있습니다.</div>
+          <div class="mb-chips">
+            <span class="mb-chip orange">PDF · DOCX · TXT · XLSX</span>
+            <span class="mb-chip orange">HTML · HWP · PPTX · MD</span>
+            <span class="mb-chip green">5종 분석 유형</span>
+            <span class="mb-chip blue">Word 보고서 자동 생성</span>
+            <span class="mb-chip purple">AI 9대 위험 분석</span>
+          </div>
+          <div class="mb-steps">
+            <span class="mb-step">① 문서 업로드</span><span class="mb-step-arrow">›</span>
+            <span class="mb-step">② 분석 유형 선택</span><span class="mb-step-arrow">›</span>
+            <span class="mb-step">③ AI 위험평가 실행</span><span class="mb-step-arrow">›</span>
+            <span class="mb-step">④ Word 보고서 다운로드</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="g2">
+        <!-- 좌: 업로드 -->
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div class="card">
+            <div class="card-title">📁 문서 업로드</div>
+            <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
+              <div class="dz-icon">📄</div>
+              <div class="dz-title">문서를 드래그하거나 클릭하여 업로드</div>
+              <div class="dz-sub">AI 서비스 기획서, 제안서, 설계서, 요구사항 정의서 등</div>
+              <div class="dz-types">PDF · DOCX · TXT · XLSX · CSV · HTML · HWP · PPTX · MD</div>
+            </div>
+            <input type="file" id="file-input" multiple accept=".pdf,.doc,.docx,.txt,.xlsx,.xls,.csv,.hwp,.pptx,.ppt,.md,.html,.htm" style="display:none" onchange="handleFileSelect(event)">
+            <div id="file-list" style="display:flex;flex-direction:column;gap:6px;margin-top:10px;"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">⚙️ 분석 설정</div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <div>
+                <label>분석 유형</label>
+                <select id="analysis-type">
+                  <option value="full">종합 위험평가 (AI기본법 전체)</option>
+                  <option value="grade">위험등급 판단만</option>
+                  <option value="checklist">체크리스트 항목 추출</option>
+                  <option value="law">관련 법령 조항 매핑</option>
+                  <option value="gap">GAP 분석 (현황 vs 법령 요건)</option>
+                </select>
+              </div>
+              <div>
+                <label>AI 서비스 단계 (문서 기준)</label>
+                <select id="analysis-stage">
+                  <option value="기획">기획 단계 (기획서·제안서)</option>
+                  <option value="개발">개발 단계 (설계서·요구사항)</option>
+                  <option value="운영">운영 단계 (운영매뉴얼·보고서)</option>
+                  <option value="자동">자동 판단</option>
+                </select>
+              </div>
+              <div>
+                <label>추가 컨텍스트 (선택)</label>
+                <textarea id="analysis-context" rows="2" placeholder="예: 이 문서는 대출심사 AI 도입을 위한 기획서입니다. 고령층 대상 서비스..."></textarea>
+              </div>
+              <button class="btn btn-a" id="analyze-btn" onclick="analyzeDocuments()" disabled>
+                🤖 AI 위험평가 시작
+              </button>
+              <div id="analyze-progress" style="display:none;">
+                <div style="font-size:11px;color:var(--muted);margin-bottom:4px;" id="analyze-status">문서 읽는 중...</div>
+                <div class="progress-bar-anim"><div class="fill" id="analyze-fill" style="width:0%;background:var(--primary)"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 우: 결과 -->
+        <div style="display:flex;flex-direction:column;gap:12px;" id="docreview-results">
+          <div class="card" style="text-align:center;padding:40px 20px;">
+            <div style="font-size:40px;margin-bottom:12px;">📋</div>
+            <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px;">문서를 업로드하고 분석을 시작하세요</div>
+            <div style="font-size:11.5px;color:var(--muted);line-height:1.7;">
+              Claude AI가 문서 내용을 읽고<br>
+              AI기본법·금융분야 AI 안내서 기준으로<br>
+              자동 위험평가를 수행합니다.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 분석 이력 -->
+      <div class="card">
+        <div class="card-title">📋 분석 이력</div>
+        <div id="analysis-history">
+          <div style="text-align:center;color:var(--muted);font-size:12px;padding:10px;">분석 이력이 없습니다.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════ PAGE: SETTINGS ════════ -->
+    <div class="page" id="page-settings">
+      <div class="menu-banner" style="border-left-color:#5F5E5A;">
+        <div class="mb-icon">⚙️</div>
+        <div class="mb-body">
+          <div class="mb-title">API 키 설정 및 데이터 관리</div>
+          <div class="mb-desc">Anthropic API 키를 등록하면 <strong>AI 어시스턴트·체크리스트 자동 생성·위험평가 분석·보고서 자동 작성</strong> 기능이 실제로 동작합니다. API 키는 브라우저 로컬 저장소에만 보관되며 외부 서버로 전송되지 않습니다. 데이터 관리 기능으로 등록된 서비스 데이터를 JSON 파일로 백업하거나 복원할 수 있습니다.</div>
+          <div class="mb-chips">
+            <span class="mb-chip blue">Anthropic Claude API</span>
+            <span class="mb-chip green">로컬 저장 (외부 전송 없음)</span>
+            <span class="mb-chip orange">JSON 백업·복원</span>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">⚙️ Anthropic API 키 설정</div>
+        <div class="alert ai" style="margin-bottom:14px;">
+          <span>ℹ</span>
+          <span>Anthropic API 키를 설정하면 AI 어시스턴트, 체크리스트 자동 생성, 보고서 자동 작성 기능이 실제로 동작합니다. 키는 브라우저 localStorage에만 저장되며 외부로 전송되지 않습니다.</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px;max-width:600px;">
+          <div>
+            <label>Anthropic API Key *</label>
+            <div style="display:flex;gap:8px;">
+              <input type="text" id="api-key-input" placeholder="sk-ant-api03-..." style="flex:1;font-family:'IBM Plex Mono',monospace;">
+              <button class="btn btn-p" onclick="saveApiKey()">저장</button>
+              <button class="btn btn-o" onclick="testApiKey()" id="test-api-btn">연결 테스트</button>
+            </div>
+          </div>
+          <div id="api-key-status" style="font-size:12px;padding:8px 12px;border-radius:6px;background:var(--surface2);display:none;"></div>
+          <div>
+            <label>사용 모델</label>
+            <select id="model-select">
+              <option value="claude-sonnet-4-5-20251022">claude-sonnet-4-5 (권장 — 빠르고 정확)</option>
+              <option value="claude-opus-4-5">claude-opus-4-5 (최고 품질)</option>
+              <option value="claude-haiku-4-5-20251001">claude-haiku-4-5 (빠른 응답)</option>
+            </select>
+          </div>
+          <div style="font-size:11.5px;color:var(--muted);padding:10px;background:var(--surface2);border-radius:6px;line-height:1.7;">
+            <strong>API 키 발급 방법:</strong><br>
+            1. <a href="https://console.anthropic.com" target="_blank" style="color:var(--primary)">console.anthropic.com</a> 접속<br>
+            2. API Keys 메뉴 → Create Key<br>
+            3. 생성된 키 복사 후 위에 입력
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">💾 데이터 관리</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="btn btn-o" onclick="exportData()">📤 데이터 내보내기 (JSON)</button>
+          <button class="btn btn-o" onclick="document.getElementById('import-file').click()">📥 데이터 가져오기</button>
+          <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(event)">
+          <button class="btn btn-o" style="color:var(--red);border-color:var(--red)" onclick="if(confirm('모든 데이터를 삭제하시겠습니까?'))clearAllData()">🗑️ 전체 초기화</button>
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-top:10px;" id="storage-info"></div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<script src="https://unpkg.com/docx@8.5.0/build/index.js"></script>
+<script>
+// ── STATE ──────────────────────────────────────────────────────
+let apiKey = localStorage.getItem('im_api_key') || '';
+let modelId = localStorage.getItem('im_model') || 'claude-sonnet-4-5-20251022';
+let services = JSON.parse(localStorage.getItem('im_services') || '[]');
+let chatHistory = [];
+let generatedReport = '';
+
+const SYSTEM_PROMPT = `당신은 iM AI Governance Management 시스템의 AI 거버넌스 전문 어시스턴트입니다.
+
+다음 법령과 내규를 기반으로 전문적이고 실용적인 답변을 제공합니다:
+- 인공지능 발전과 신뢰 기반 조성 등에 관한 기본법 (AI기본법)
+- AI기본법 시행령 (제22조 투명성 면제, 제24조 설명제공, 제26조 홈페이지게시)
+- AI기본법 제31조 (사전고지·표시 의무), 제34조 (고영향AI 사업자 책무)
+- 신용정보법 제36조의2 (자동화평가 설명의무)
+- 개인정보보호법 제37조의2 (자동화결정 이의제기)
+- 금융소비자보호법 제15조 (차별금지)
+- 금융위원회 금융분야 AI 개발·활용 안내서
+- 과기부 고영향 AI 사업자 책무 가이드라인
+- iM금융지주 AI 거버넌스 매뉴얼 v1.11
+
+AI 9대 위험: 성능, 공정성, 유해성, 설명가능성, 데이터보호, 제3자위험, 사이버보안, 통제가능성, 지식재산권
+
+고영향 AI 판단: 채용(구직자 프로파일링·점수화), 대출심사(신용평가·여신가부 결정)
+
+위험등급: 고위험(고영향AI) > 중위험(소비자권익·평판 영향) > 저위험
+
+답변은 한국어로 하고, 실무에 바로 적용할 수 있도록 구체적이고 명확하게 작성하세요.
+체크리스트는 번호와 함께 명확한 항목으로 나열하세요.`;
+
+// ── NAV ────────────────────────────────────────────────────────
+const pages = {
+  'dashboard':  { t:'거버넌스 대시보드',    b:'홈 / 대시보드' },
+  'register':   { t:'AI 서비스 등록',        b:'홈 / 서비스 등록' },
+  'checklist':  { t:'위험평가 체크리스트',   b:'홈 / 체크리스트' },
+  'report':     { t:'보고서 자동 생성',       b:'홈 / 보고서' },
+  'settings':   { t:'API 키 설정',            b:'홈 / 설정' },
+  'assistant':  { t:'AI 거버넌스 어시스턴트', b:'홈 / AI 어시스턴트' },
+  'docreview':  { t:'문서 위험평가 분석',     b:'홈 / 문서 분석' },
+};
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.querySelectorAll('.nav').forEach(n => {
+    if ((n.getAttribute('onclick')||'').includes("'"+id+"'")) n.classList.add('active');
+  });
+  document.getElementById('page-title').textContent = pages[id]?.t || id;
+  document.getElementById('page-bc').textContent = pages[id]?.b || '';
+  if (id === 'monitor') refreshMonitor();
+  if (id === 'checklist' || id === 'report') populateServiceSelects();
+}
+
+// ── API ────────────────────────────────────────────────────────
+async function callClaude(messages, maxTokens = 2000) {
+  if (!apiKey) throw new Error('API 키가 설정되지 않았습니다.');
+  const resp = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model: modelId,
+      max_tokens: maxTokens,
+      system: SYSTEM_PROMPT,
+      messages
+    })
+  });
+  if (!resp.ok) {
+    const err = await resp.json().catch(() => ({}));
+    throw new Error(err.error?.message || `API 오류 (${resp.status})`);
+  }
+  const data = await resp.json();
+  return data.content[0].text;
+}
+
+// ── SETTINGS ───────────────────────────────────────────────────
+function saveApiKey() {
+  const key = document.getElementById('api-key-input').value.trim();
+  if (!key) return alert('API 키를 입력하세요.');
+  apiKey = key;
+  const model = document.getElementById('model-select').value;
+  modelId = model;
+  localStorage.setItem('im_api_key', key);
+  localStorage.setItem('im_model', model);
+  updateApiStatus(true);
+  showStatus('api-key-status', '✔ API 키가 저장되었습니다.', 'as');
+}
+
+async function testApiKey() {
+  const key = document.getElementById('api-key-input').value.trim() || apiKey;
+  if (!key) return alert('API 키를 입력하세요.');
+  const btn = document.getElementById('test-api-btn');
+  btn.disabled = true; btn.textContent = '테스트 중...';
+  try {
+    const tmpKey = apiKey;
+    apiKey = key;
+    await callClaude([{role:'user', content:'안녕하세요. 연결 테스트입니다. 한 문장으로 응답해주세요.'}], 50);
+    apiKey = key;
+    localStorage.setItem('im_api_key', key);
+    updateApiStatus(true);
+    showStatus('api-key-status', '✔ 연결 성공! Claude API와 정상 통신 중입니다.', 'as');
+  } catch(e) {
+    apiKey = localStorage.getItem('im_api_key') || '';
+    showStatus('api-key-status', '✗ 연결 실패: ' + e.message, 'ar');
+    updateApiStatus(false);
+  }
+  btn.disabled = false; btn.textContent = '연결 테스트';
+}
+
+function showStatus(id, msg, cls) {
+  const el = document.getElementById(id);
+  el.style.display = 'block';
+  el.className = 'alert ' + cls;
+  el.innerHTML = msg;
+}
+
+function updateApiStatus(connected) {
+  const badge = document.getElementById('api-status-badge');
+  const inp = document.getElementById('chat-input');
+  const btn = document.getElementById('chat-send-btn');
+  const aStatus = document.getElementById('assistant-status');
+  const warn = document.getElementById('api-warning');
+  if (connected) {
+    badge.style.background = '#E6FAF5'; badge.style.color = '#065f46';
+    badge.textContent = '⬤ API 연결됨';
+    inp.disabled = false; btn.disabled = false;
+    aStatus.textContent = '● 연결됨'; aStatus.style.background = '#27a879';
+    if (warn) warn.style.display = 'none';
+  } else {
+    badge.style.background = '#FFF8E1'; badge.style.color = '#856404';
+    badge.textContent = '⬤ API 미연결';
+    inp.disabled = true; btn.disabled = true;
+    aStatus.textContent = '● 미연결'; aStatus.style.background = '#E8453C';
+    if (warn) warn.style.display = 'flex';
+  }
+}
+
+// ── REGISTER ──────────────────────────────────────────────────
+async function autoGradeRisk() {
+  const category = document.getElementById('reg-category').value;
+  const aitype = document.getElementById('reg-aitype').value;
+  const desc = document.getElementById('reg-desc').value;
+  const el = document.getElementById('grade-result');
+  if (!category) { el.innerHTML = '<div class="card-title">⚠ 서비스 분류를 선택하세요.</div>'; return; }
+
+  let grade, reason, items;
+  if (category.includes('고영향')) {
+    grade = '고위험'; reason = 'AI기본법상 고영향 AI — 가장 강화된 관리 적용';
+    items = ['기본점검','AI 9대 위험 全항목','AI기본법 고영향 의무','생성형 AI 투명성 의무(해당시)'];
+  } else if (category.includes('FDS') || category.includes('추천') || category.includes('리스크')) {
+    grade = '중위험'; reason = '소비자 권익·평판에 영향 가능성';
+    items = ['기본점검','AI 9대 위험 일부','생성형 AI 투명성 의무(해당시)'];
+  } else {
+    grade = '저위험'; reason = '기본적인 AI 위험관리 적용';
+    items = ['기본점검','AI 9대 위험 일부'];
+  }
+  const colorMap = {'고위험':'var(--red)','중위험':'var(--yellow)','저위험':'var(--green)'};
+  el.innerHTML = `<div class="card-title">🤖 AI 위험등급 산정 결과</div>
+    <div style="text-align:center;padding:12px 0;">
+      <div style="font-size:36px;font-weight:900;color:${colorMap[grade]}">${grade}</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px;">${reason}</div>
+    </div>
+    <div style="font-size:11.5px;"><strong>관리 항목:</strong><br>
+    ${items.map(i=>`<span style="display:inline-block;margin:2px;padding:2px 7px;background:var(--surface2);border-radius:4px;font-size:10.5px;">${i}</span>`).join('')}
+    </div>`;
+
+  // AI 보완 (API 연결시)
+  if (apiKey) {
+    try {
+      const aiGrade = await callClaude([{role:'user', content:`다음 AI 서비스의 위험등급과 주요 관리 포인트를 2-3문장으로 간략히 설명해주세요:\n서비스 분류: ${category}\nAI 유형: ${aitype}\n설명: ${desc}`}], 300);
+      el.innerHTML += `<div style="margin-top:10px;padding:8px;background:rgba(10,61,145,.06);border-radius:6px;font-size:11px;line-height:1.6;color:var(--text);">🤖 AI 보완 의견: ${aiGrade}</div>`;
+    } catch(e) {}
+  }
+}
+
+function registerService() {
+  const name = document.getElementById('reg-name').value.trim();
+  if (!name) { alert('서비스명을 입력하세요.'); return; }
+  const category = document.getElementById('reg-category').value || '기타';
+  const aitype = document.getElementById('reg-aitype').value;
+  const biztype = document.getElementById('reg-biztype').value;
+  const stage = document.getElementById('reg-stage').value;
+  const desc = document.getElementById('reg-desc').value;
+
+  let grade = '저위험';
+  if (category.includes('고영향')) grade = '고위험';
+  else if (category.includes('FDS') || category.includes('추천') || category.includes('리스크')) grade = '중위험';
+
+  const svc = {
+    id: Date.now().toString(),
+    name, category, aitype, biztype, stage, desc, grade,
+    createdAt: new Date().toLocaleDateString('ko-KR'),
+    checklistDone: 0, checklistTotal: 0, status: '검토중',
+    checklistData: {}
+  };
+  services.push(svc);
+  saveServices();
+  updateDashboard();
+  populateServiceSelects();
+  alert(`'${name}' 서비스가 등록되었습니다.`);
+  document.getElementById('reg-name').value = '';
+  document.getElementById('reg-desc').value = '';
+  showPage('dashboard');
+}
+
+// ── CHECKLIST ─────────────────────────────────────────────────
+const CHECKLIST_ITEMS = {
+  기획: [
+    {id:'1.1.1', cat:'기본점검', sub:'윤리원칙', q:'AI 서비스 활용 목적이 AI 윤리원칙(공정성·투명성·안전성)에 부합하는가?', law:'금융분야 AI 안내서', grades:['고위험','중위험','저위험']},
+    {id:'2.1.1', cat:'고위험AI', sub:'위험관리방안', q:'AI기본법상 위험관리방안(정책·교육·조직체계)을 수립하였는가?', law:'AI기본법 제34조①1호', grades:['고위험']},
+    {id:'2.2.1', cat:'고위험AI', sub:'이용자보호', q:'AI 서비스에 대한 이용자 보호 방안(보안대책·오작동방지·피드백절차)을 수립하였는가?', law:'AI기본법 제34조①3호', grades:['고위험']},
+    {id:'2.4.1', cat:'고위험AI', sub:'설명제공', q:'결과·산출기준·학습데이터 개요 등 설명 방안(XAI 적용)을 수립하였는가?', law:'시행령 초안 제24조', grades:['고위험']},
+    {id:'2.5.1', cat:'고위험AI', sub:'사전고지', q:'AI 기반 운용 사실을 이용자에게 사전 고지하는 방안을 마련하였는가?', law:'AI기본법 제31조①', grades:['고위험']},
+    {id:'3.1.1', cat:'생성형AI', sub:'사전고지표시', q:'생성형 AI임을 이용자에게 사전 고지하고 결과물에 표시하는 방안을 마련하였는가?', law:'AI기본법 제31조①', grades:['고위험','중위험','저위험']},
+    {id:'4.1.1', cat:'AI9대위험', sub:'공정성', q:'법령상 차별금지 규제(금소법 제15조) 적용 여부 확인 및 공정성 지표를 선정하였는가?', law:'금융분야 AI 안내서', grades:['고위험']},
+    {id:'4.2.1', cat:'AI9대위험', sub:'유해성', q:'유해하거나 불법적인 콘텐츠가 AI 시스템을 통해 도출될 가능성을 확인하였는가?', law:'금융분야 AI 안내서', grades:['고위험','중위험','저위험']},
+    {id:'4.3.1', cat:'AI9대위험', sub:'제3자위험', q:'업무위수탁이 발생하는 경우 AI 업무위수탁 체크리스트에 따른 점검을 이행하였는가?', law:'금융분야 AI 안내서', grades:['고위험']},
+    {id:'4.4.1', cat:'AI9대위험', sub:'통제가능성', q:'AI 결과에 따른 의사결정 시 임직원 개입 기준 및 절차(HITL)를 정의하였는가?', law:'금융분야 AI 안내서', grades:['고위험','중위험']},
+  ],
+  개발: [
+    {id:'1.1.1', cat:'기본점검', sub:'개발계획검토', q:'기획부서의 개발 요건을 검토하고 개발 계획에 반영하여 이행하였는가?', law:'해당없음', grades:['고위험','중위험','저위험']},
+    {id:'2.1.1', cat:'고위험AI', sub:'설명제공', q:'AI기본법에 따른 설명(결과·기준·학습데이터)을 제공하도록 개발하였는가?', law:'시행령 초안 제24조', grades:['고위험']},
+    {id:'2.2.1', cat:'고위험AI', sub:'사전고지', q:'AI 기반 운용 사실을 이용자에게 사전 고지하도록 개발하였는가?', law:'AI기본법 제31조①', grades:['고위험']},
+    {id:'4.1.1', cat:'AI9대위험', sub:'성능', q:'AI 모형 성능 평가 지표(Precision·F1·AUROC 등)를 선정하여 평가검증을 수행하였는가?', law:'금융분야 AI 안내서', grades:['고위험','중위험']},
+    {id:'4.2.1', cat:'AI9대위험', sub:'공정성', q:'편향성 지표(PSI≥0.25, Fairness Tree)를 선정하여 개발 단계별 편향 테스트를 수행하였는가?', law:'금융분야 AI 안내서', grades:['고위험']},
+    {id:'4.4.1', cat:'AI9대위험', sub:'설명가능성', q:'SHAP/LIME 등 XAI 기술을 적용하거나 대안을 검토하였는가?', law:'금융분야 AI 안내서', grades:['고위험']},
+    {id:'4.5.1', cat:'AI9대위험', sub:'데이터보호', q:'신뢰할 수 있는 출처의 학습데이터를 사용하고 메타정보(출처·버전·수정이력)를 기록하였는가?', law:'TTA 개발안내서', grades:['고위험','중위험']},
+    {id:'4.7.1', cat:'AI9대위험', sub:'사이버보안', q:'적대적 예제 학습, 가드레일 탑재 등 AI 모델 공격 대비를 하였는가?', law:'국정원 가이드라인', grades:['고위험','중위험']},
+    {id:'4.8.1', cat:'AI9대위험', sub:'통제가능성', q:'긴급 중단 버튼 구현 및 반응 시간(latency) — 통제 불가 위험 대비 개발하였는가?', law:'금융분야 AI 안내서', grades:['고위험','중위험']},
+  ],
+  운영: [
+    {id:'1.1.1', cat:'기본점검', sub:'서비스재평가', q:'데이터 드리프트·규제변화·기술발전 등 AI 서비스 재평가 필요성을 검토하였는가?', law:'해당없음', grades:['고위험','중위험']},
+    {id:'2.1.1', cat:'AI9대위험', sub:'성능', q:'성능을 정기적으로 모니터링하고 변경/개선 이력을 관리하고 있는가?', law:'금융분야 AI 안내서', grades:['고위험']},
+    {id:'2.2.1', cat:'AI9대위험', sub:'공정성', q:'특정 금융소비자에게 불합리한 (불)이익이 발생하는지 여부를 모니터링하였는가?', law:'해당없음', grades:['고위험']},
+    {id:'2.3.1', cat:'AI9대위험', sub:'유해성', q:'의도와 무관하게 유해한 결과를 만들어내는 경우가 없는지 모니터링하고 있는가?', law:'해당없음', grades:['고위험','중위험']},
+    {id:'2.4.1', cat:'AI9대위험', sub:'데이터보호', q:'개인정보·비공개 업무자료 유출을 지속 모니터링하고 이상 발견 시 점검부서에 보고하였는가?', law:'해당없음', grades:['고위험','중위험','저위험']},
+    {id:'2.6.1', cat:'AI9대위험', sub:'사이버보안', q:'데이터 오염 공격·적대적 공격 등 오용·악용 가능성 여부를 모니터링하였는가?', law:'금융분야 AI 안내서', grades:['고위험','중위험']},
+    {id:'2.7.1', cat:'AI9대위험', sub:'통제가능성', q:'인간 개입/중단 절차가 마련되어 있으며 정상 작동하고 있는지 모니터링하였는가?', law:'금융분야 AI 안내서', grades:['고위험','중위험']},
+  ]
+};
+
+function populateServiceSelects() {
+  ['cl-service-select','rpt-service'].forEach(id => {
+    const sel = document.getElementById(id);
+    if (!sel) return;
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">-- 선택 --</option>';
+    services.forEach(s => {
+      const opt = document.createElement('option');
+      opt.value = s.id; opt.textContent = s.name + ' (' + s.grade + ')';
+      if (s.id === cur) opt.selected = true;
+      sel.appendChild(opt);
+    });
+  });
+}
+
+function loadChecklist() {}
+
+async function generateAIChecklist() {
+  const svcId = document.getElementById('cl-service-select').value;
+  const stage = document.getElementById('cl-stage-select').value;
+  if (!svcId) { alert('서비스를 선택하세요.'); return; }
+  const svc = services.find(s => s.id === svcId);
+  if (!svc) return;
+
+  const items = CHECKLIST_ITEMS[stage].filter(item => item.grades.includes(svc.grade));
+  const area = document.getElementById('checklist-area');
+
+  let html = `<div class="card">
+    <div class="card-title">${svc.name} — ${stage} 단계 위험평가 체크리스트 <span class="law">${svc.grade}</span></div>
+    <div class="alert ai" style="margin-bottom:12px;"><span>🤖</span><span>${items.length}개 항목 자동 생성 완료 (${svc.grade} 기준). 평가 결과를 선택하면 자동 저장됩니다.</span></div>
+    <div class="tw"><table>
+    <thead><tr><th>구분</th><th>대/중구분</th><th>평가 문항</th><th>평가결과</th><th>비고</th><th>관련법령</th></tr></thead>
+    <tbody>`;
+
+  if (!svc.checklistData[stage]) svc.checklistData[stage] = {};
+
+  items.forEach(item => {
+    const saved = svc.checklistData[stage][item.id] || {};
+    const result = saved.result || '';
+    const note = saved.note || '';
+    const colors = {Y:'color:var(--green)', N:'color:var(--red)', 'N/A':'color:var(--muted)', '보완필요':'color:var(--yellow)'};
+    html += `<tr>
+      <td class="mono" style="font-weight:700">${item.id}</td>
+      <td><strong>${item.cat}</strong><br><span style="font-size:9.5px;color:var(--muted)">${item.sub}</span></td>
+      <td style="font-size:10.5px;max-width:280px;">${item.q}</td>
+      <td>
+        <select style="width:100px;font-size:11px;" onchange="saveChecklistItem('${svcId}','${stage}','${item.id}',this.value,document.getElementById('note_${item.id}').value)">
+          <option value="">-</option>
+          <option value="Y" ${result==='Y'?'selected':''}>Y — 충족</option>
+          <option value="N" ${result==='N'?'selected':''}>N — 미충족</option>
+          <option value="보완필요" ${result==='보완필요'?'selected':''}>보완필요</option>
+          <option value="N/A" ${result==='N/A'?'selected':''}>N/A</option>
+        </select>
+      </td>
+      <td><input type="text" id="note_${item.id}" value="${note}" placeholder="의견 입력" style="font-size:10.5px;width:130px;" onblur="saveChecklistItem('${svcId}','${stage}','${item.id}',this.parentElement.previousElementSibling.querySelector('select').value,this.value)"></td>
+      <td style="font-size:9.5px;color:var(--primary)">${item.law}</td>
+    </tr>`;
+  });
+
+  html += `</tbody></table></div>
+    <div style="margin-top:12px;display:flex;gap:8px;align-items:center;">
+      <div style="flex:1;font-size:11.5px;" id="cl-summary-${svcId}">저장된 결과를 불러오는 중...</div>
+      <button class="btn btn-a btn-sm" onclick="getAIChecklistReview('${svcId}','${stage}')">🤖 AI 검토의견 받기</button>
+      <button class="btn btn-p btn-sm" onclick="showPage('report')">📄 보고서 생성</button>
+    </div>
+    <div id="ai-review-${svcId}" style="display:none;margin-top:10px;"></div>
+  </div>`;
+
+  area.innerHTML = html;
+  updateChecklistSummary(svcId, stage);
+}
+
+function saveChecklistItem(svcId, stage, itemId, result, note) {
+  const svc = services.find(s => s.id === svcId);
+  if (!svc) return;
+  if (!svc.checklistData[stage]) svc.checklistData[stage] = {};
+  svc.checklistData[stage][itemId] = { result, note, updatedAt: new Date().toLocaleDateString('ko-KR') };
+  const stageItems = CHECKLIST_ITEMS[stage].filter(item => item.grades.includes(svc.grade));
+  const done = stageItems.filter(item => svc.checklistData[stage][item.id]?.result).length;
+  svc.checklistDone = done; svc.checklistTotal = stageItems.length;
+  const warn = stageItems.filter(item => ['N','보완필요'].includes(svc.checklistData[stage][item.id]?.result)).length;
+  svc.status = done === stageItems.length ? (warn > 0 ? '보완필요' : '승인완료') : '검토중';
+  saveServices();
+  updateChecklistSummary(svcId, stage);
+  updateDashboard();
+}
+
+function updateChecklistSummary(svcId, stage) {
+  const svc = services.find(s => s.id === svcId);
+  const el = document.getElementById(`cl-summary-${svcId}`);
+  if (!svc || !el) return;
+  const items = CHECKLIST_ITEMS[stage].filter(i => i.grades.includes(svc.grade));
+  const data = svc.checklistData[stage] || {};
+  const done = items.filter(i => data[i.id]?.result).length;
+  const warn = items.filter(i => ['N','보완필요'].includes(data[i.id]?.result)).length;
+  const ycount = items.filter(i => data[i.id]?.result === 'Y').length;
+  el.innerHTML = `<strong>진행:</strong> ${done}/${items.length} &nbsp; <span style="color:var(--green)">✔ ${ycount}건</span> &nbsp; <span style="color:var(--red)">⚠ ${warn}건 보완</span>`;
+}
+
+async function getAIChecklistReview(svcId, stage) {
+  if (!apiKey) { alert('API 키를 먼저 설정하세요.'); showPage('settings'); return; }
+  const svc = services.find(s => s.id === svcId);
+  const items = CHECKLIST_ITEMS[stage].filter(i => i.grades.includes(svc.grade));
+  const data = svc.checklistData[stage] || {};
+  const summary = items.map(i => `${i.id} ${i.sub}: ${data[i.id]?.result || '미입력'} ${data[i.id]?.note || ''}`).join('\n');
+  const reviewEl = document.getElementById(`ai-review-${svcId}`);
+  reviewEl.style.display = 'block';
+  reviewEl.innerHTML = '<div class="alert ai"><span>🤖</span><span>AI가 체크리스트를 검토 중입니다...</span></div>';
+  try {
+    const review = await callClaude([{role:'user', content:`다음 AI 서비스의 ${stage} 단계 위험평가 체크리스트 결과를 검토하고, 문제점과 개선 권고사항을 구체적으로 작성해주세요.\n\n서비스명: ${svc.name}\n위험등급: ${svc.grade}\n\n체크리스트 결과:\n${summary}`}], 600);
+    reviewEl.innerHTML = `<div style="background:rgba(10,61,145,.06);border-left:3px solid var(--primary);border-radius:0;padding:12px;font-size:11.5px;line-height:1.7;white-space:pre-wrap;">${review}</div>`;
+  } catch(e) {
+    reviewEl.innerHTML = `<div class="alert ar"><span>✗</span><span>${e.message}</span></div>`;
+  }
+}
+
+// ── REPORT ────────────────────────────────────────────────────
+async function generateReport() {
+  if (!apiKey) { alert('API 키를 먼저 설정하세요.'); showPage('settings'); return; }
+  const svcId = document.getElementById('rpt-service').value;
+  if (!svcId) { alert('서비스를 선택하세요.'); return; }
+  const svc = services.find(s => s.id === svcId);
+  const rptType = document.getElementById('rpt-type').value;
+  const receiver = document.getElementById('rpt-receiver').value;
+  const notes = document.getElementById('rpt-notes').value;
+
+  const btn = document.getElementById('rpt-btn');
+  btn.disabled = true; btn.textContent = '🤖 AI가 보고서를 작성 중...';
+  const outEl = document.getElementById('report-output');
+  outEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);">Claude AI가 보고서를 실시간으로 작성 중입니다...</div>';
+
+  const checklistSummary = Object.entries(svc.checklistData || {}).map(([stage, data]) => {
+    const items = CHECKLIST_ITEMS[stage] || [];
+    return `[${stage} 단계]\n` + items.filter(i => data[i.id]).map(i => `  - ${i.sub}: ${data[i.id].result} ${data[i.id].note || ''}`).join('\n');
+  }).join('\n\n');
+
+  const prompt = `다음 정보를 바탕으로 "${rptType}"를 공식 문서 형식으로 작성해주세요.
+
+서비스명: ${svc.name}
+서비스 분류: ${svc.category}
+AI 유형: ${svc.aitype}
+사업자 유형: ${svc.biztype}
+현재 단계: ${svc.stage}
+위험등급: ${svc.grade}
+서비스 설명: ${svc.desc}
+등록일: ${svc.createdAt}
+수신: ${receiver || 'AI 거버넌스 주관부서'}
+
+위험평가 체크리스트 결과:
+${checklistSummary || '아직 체크리스트 미수행'}
+
+추가 요청사항: ${notes || '없음'}
+
+보고서 형식:
+1. 제목, 작성일, 수신, 발신 포함
+2. 서비스 개요
+3. 위험등급 판단 근거
+4. 체크리스트 검토 결과 요약
+5. 보완 필요 항목 및 조치 권고
+6. 종합 의견 및 결론
+7. 관련 법령 (AI기본법 조항 명시)`;
+
+  try {
+    const report = await callClaude([{role:'user', content:prompt}], 1500);
+    generatedReport = report;
+    outEl.innerHTML = `<div class="report-preview">${report}</div>`;
+    document.getElementById('report-actions').style.display = 'flex';
+  } catch(e) {
+    outEl.innerHTML = `<div class="alert ar"><span>✗</span><span>${e.message}</span></div>`;
+  }
+  btn.disabled = false; btn.textContent = '🤖 AI로 보고서 생성';
+}
+
+function copyReport() {
+  navigator.clipboard.writeText(generatedReport).then(() => alert('클립보드에 복사되었습니다.'));
+}
+function downloadReport() {
+  const blob = new Blob([generatedReport], {type:'text/plain;charset=utf-8'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = `AI_거버넌스_보고서_${new Date().toISOString().slice(0,10)}.txt`;
+  a.click();
+}
+
+// ── CHAT ──────────────────────────────────────────────────────
+async function sendChat() {
+  const inp = document.getElementById('chat-input');
+  const msg = inp.value.trim();
+  if (!msg) return;
+  if (!apiKey) { alert('API 키를 먼저 설정하세요.'); showPage('settings'); return; }
+  inp.value = '';
+  addMsg(msg, 'user');
+  chatHistory.push({role:'user', content:msg});
+
+  const typing = document.createElement('div');
+  typing.className = 'ai-typing';
+  typing.innerHTML = '<span></span><span></span><span></span>';
+  document.getElementById('chat-msgs').appendChild(typing);
+  scrollChat();
+
+  const sendBtn = document.getElementById('chat-send-btn');
+  inp.disabled = true; sendBtn.disabled = true;
+
+  try {
+    const reply = await callClaude(chatHistory.slice(-10), 1200);
+    typing.remove();
+    addMsg(reply, 'bot');
+    chatHistory.push({role:'assistant', content:reply});
+    updateChatHistorySummary();
+  } catch(e) {
+    typing.remove();
+    addMsg('오류가 발생했습니다: ' + e.message, 'bot');
+  }
+  inp.disabled = false; sendBtn.disabled = false;
+  inp.focus();
+}
+
+function quickChat(msg) {
+  showPage('assistant');
+  setTimeout(() => {
+    document.getElementById('chat-input').value = msg;
+    sendChat();
+  }, 100);
+}
+
+function addMsg(text, role) {
+  const el = document.createElement('div');
+  el.className = 'ai-msg ' + (role === 'user' ? 'user' : 'bot');
+  el.innerHTML = `<div class="lbl">${role === 'user' ? '담당자' : 'AI 어시스턴트'}</div>${text.replace(/\n/g,'<br>')}`;
+  document.getElementById('chat-msgs').appendChild(el);
+  scrollChat();
+}
+
+function scrollChat() {
+  const el = document.getElementById('chat-msgs');
+  el.scrollTop = el.scrollHeight;
+}
+
+function clearChat() {
+  chatHistory = [];
+  document.getElementById('chat-msgs').innerHTML = `<div class="ai-msg bot"><div class="lbl">AI 어시스턴트</div>대화가 초기화되었습니다. 무엇을 도와드릴까요?</div>`;
+  updateChatHistorySummary();
+}
+
+function updateChatHistorySummary() {
+  const el = document.getElementById('chat-history-summary');
+  const userMsgs = chatHistory.filter(m => m.role === 'user').length;
+  el.textContent = userMsgs > 0 ? `총 ${userMsgs}개 질문 / ${chatHistory.length}개 메시지` : '대화 없음';
+}
+
+// ── DASHBOARD / MONITOR ───────────────────────────────────────
+function updateDashboard() {
+  document.getElementById('dash-total').textContent = services.length;
+  document.getElementById('dash-ongoing').textContent = services.filter(s => s.status === '검토중').length;
+  document.getElementById('dash-done').textContent = services.filter(s => s.status === '승인완료').length;
+  document.getElementById('dash-warn').textContent = services.filter(s => s.status === '보완필요').length;
+
+  const tbody = document.getElementById('service-tbody');
+  if (services.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:20px;">등록된 서비스가 없습니다.</td></tr>';
+    return;
+  }
+  const riskColor = {'고위험':'r3','중위험':'r2','저위험':'r1'};
+  const statusColor = {'검토중':'color:var(--yellow)','승인완료':'color:var(--green)','보완필요':'color:var(--red)'};
+  tbody.innerHTML = services.map(s => `
+    <tr>
+      <td><strong>${s.name}</strong><br><span style="font-size:9.5px;color:var(--muted)">${s.category}</span></td>
+      <td><span class="chip">${s.aitype.split(' ')[0]}</span></td>
+      <td><span class="risk ${riskColor[s.grade]||'r1'}">${s.grade}</span></td>
+      <td><span class="chip">${s.stage}</span></td>
+      <td style="font-size:10.5px;">${s.checklistTotal > 0 ? s.checklistDone+'/'+s.checklistTotal+'항목' : '미수행'}</td>
+      <td style="font-size:11px;font-weight:600;${statusColor[s.status]||''}">${s.status === '승인완료' ? '✔ '+s.status : s.status === '보완필요' ? '⚠ '+s.status : '● '+s.status}</td>
+      <td style="display:flex;gap:4px;flex-wrap:wrap;">
+        <button class="btn btn-o btn-sm" onclick="goChecklist('${s.id}')">체크리스트</button>
+        <button class="btn btn-o btn-sm" style="color:var(--red)" onclick="deleteService('${s.id}')">삭제</button>
+      </td>
+    </tr>`).join('');
+}
+
+function goChecklist(svcId) {
+  showPage('checklist');
+  setTimeout(() => {
+    document.getElementById('cl-service-select').value = svcId;
+    generateAIChecklist();
+  }, 100);
+}
+
+function deleteService(id) {
+  if (!confirm('서비스를 삭제하시겠습니까?')) return;
+  services = services.filter(s => s.id !== id);
+  saveServices(); updateDashboard(); populateServiceSelects();
+}
+
+function refreshMonitor() {
+  const now = new Date().toLocaleTimeString('ko-KR');
+  document.getElementById('mon-time').textContent = now;
+  const normal = services.filter(s => s.status === '승인완료').length;
+  const review = services.filter(s => s.status === '검토중').length;
+  const action = services.filter(s => s.status === '보완필요').length;
+  document.getElementById('mon-normal').textContent = normal;
+  document.getElementById('mon-review').textContent = review;
+  document.getElementById('mon-action').textContent = action;
+
+  const tbody = document.getElementById('monitor-tbody');
+  if (services.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:20px;">등록된 서비스가 없습니다.</td></tr>';
+  } else {
+    const riskColor = {'고위험':'r3','중위험':'r2','저위험':'r1'};
+    tbody.innerHTML = services.map(s => {
+      const lastStage = Object.keys(s.checklistData||{}).slice(-1)[0] || '-';
+      const items = lastStage !== '-' ? CHECKLIST_ITEMS[lastStage]?.filter(i=>i.grades.includes(s.grade)) : [];
+      const done = items.length > 0 ? (Object.keys(s.checklistData[lastStage]||{}).length)+'/'+items.length : '-';
+      return `<tr>
+        <td><strong>${s.name}</strong></td>
+        <td><span class="risk ${riskColor[s.grade]||'r1'}">${s.grade}</span></td>
+        <td style="font-size:10.5px;">${s.createdAt}</td>
+        <td style="font-size:10.5px;">${done}</td>
+        <td style="font-size:11px;font-weight:600;${s.status==='승인완료'?'color:var(--green)':s.status==='보완필요'?'color:var(--red)':'color:var(--yellow)'}">
+          ${s.status==='승인완료'?'🟢':s.status==='보완필요'?'🔴':'🟡'} ${s.status}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  const alertsEl = document.getElementById('monitor-alerts');
+  const alerts = services.filter(s => s.status === '보완필요').map(s =>
+    `<div class="ci fail"><div class="cb fail">!</div><div class="ct"><strong>${s.name}</strong><span>보완 필요 항목 존재 — 체크리스트 검토 요청</span></div></div>`
+  ).join('') || '<div style="text-align:center;color:var(--muted);font-size:12px;padding:10px;">이상 없음</div>';
+  alertsEl.innerHTML = alerts;
+}
+
+// ── DATA PERSISTENCE ──────────────────────────────────────────
+function saveServices() { localStorage.setItem('im_services', JSON.stringify(services)); }
+
+function exportData() {
+  const data = { services, exportedAt: new Date().toISOString() };
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = `im_governance_data_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+}
+
+function importData(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (data.services) {
+        services = data.services; saveServices();
+        updateDashboard(); populateServiceSelects();
+        alert('데이터 가져오기 완료: ' + services.length + '개 서비스');
+      }
+    } catch(err) { alert('파일 형식 오류: ' + err.message); }
+  };
+  reader.readAsText(file);
+}
+
+function clearAllData() {
+  localStorage.removeItem('im_services');
+  services = []; updateDashboard(); populateServiceSelects();
+  alert('모든 데이터가 초기화되었습니다.');
+}
+
+function updateStorageInfo() {
+  const used = JSON.stringify(localStorage).length;
+  const el = document.getElementById('storage-info');
+  if (el) el.textContent = `로컬 저장소 사용량: ${(used/1024).toFixed(1)} KB / 5,120 KB`;
+}
+
+// ── DOCUMENT ANALYSIS ────────────────────────────────────────
+let uploadedFiles = [];
+let analysisHistory = JSON.parse(localStorage.getItem('im_analysis_history') || '[]');
+
+function handleDragOver(e) {
+  e.preventDefault();
+  document.getElementById('drop-zone').classList.add('drag');
+}
+function handleDragLeave(e) {
+  document.getElementById('drop-zone').classList.remove('drag');
+}
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('drop-zone').classList.remove('drag');
+  addFiles(Array.from(e.dataTransfer.files));
+}
+function handleFileSelect(e) {
+  addFiles(Array.from(e.target.files));
+  e.target.value = '';
+}
+
+function addFiles(files) {
+  const allowed = ['pdf','doc','docx','txt','xlsx','xls','csv','hwp','pptx','ppt','md','html','htm'];
+  files.forEach(f => {
+    const ext = f.name.split('.').pop().toLowerCase();
+    if (!allowed.includes(ext)) { alert(`${f.name}: 지원하지 않는 형식입니다.`); return; }
+    if (f.size > 10 * 1024 * 1024) { alert(`${f.name}: 10MB 이하 파일만 지원합니다.`); return; }
+    if (uploadedFiles.find(u => u.name === f.name)) return;
+    uploadedFiles.push(f);
+  });
+  renderFileList();
+}
+
+function renderFileList() {
+  const el = document.getElementById('file-list');
+  const btn = document.getElementById('analyze-btn');
+  if (uploadedFiles.length === 0) { el.innerHTML = ''; btn.disabled = true; return; }
+  btn.disabled = !apiKey;
+  const icons = {pdf:'📕', doc:'📘', docx:'📘', txt:'📄', xlsx:'📗', xls:'📗', csv:'📊', hwp:'📃', pptx:'📙', ppt:'📙', md:'📝', html:'🌐', htm:'🌐'};
+  el.innerHTML = uploadedFiles.map((f, i) => {
+    const ext = f.name.split('.').pop().toLowerCase();
+    const size = f.size > 1024*1024 ? (f.size/1024/1024).toFixed(1)+'MB' : (f.size/1024).toFixed(0)+'KB';
+    return `<div class="file-item">
+      <span class="fi-icon">${icons[ext]||'📄'}</span>
+      <div class="fi-name">${f.name}</div>
+      <span class="fi-size">${size}</span>
+      <span class="fi-remove" onclick="removeFile(${i})">✕</span>
+    </div>`;
+  }).join('');
+}
+
+function removeFile(idx) {
+  uploadedFiles.splice(idx, 1);
+  renderFileList();
+}
+
+async function readFileAsText(file) {
+  const ext = file.name.split('.').pop().toLowerCase();
+  if (ext === 'pdf') return await readAsBase64(file);
+  const raw = await readAsText(file).catch(() => `[파일명: ${file.name} — 읽기 실패]`);
+  if (['html','htm'].includes(ext)) {
+    const tmp = document.createElement('div');
+    tmp.innerHTML = raw;
+    ['script','style','noscript','header','footer','nav'].forEach(t => tmp.querySelectorAll(t).forEach(el => el.remove()));
+    return tmp.innerText || tmp.textContent || raw;
+  }
+  return raw;
+}
+
+function copyAnalysis() {
+  navigator.clipboard.writeText(window._lastAnalysis || '').then(() => alert('분석 결과가 클립보드에 복사되었습니다.'));
+}
+
+async function downloadAnalysis() {
+  if (!window._lastAnalysis) { alert('먼저 분석을 실행하세요.'); return; }
+  const btnEl = document.querySelector('[onclick*="downloadAnalysis"]');
+  if (btnEl) { btnEl.disabled = true; btnEl.textContent = '⏳ Word 생성 중...'; }
+  try {
+    await generateDocx(window._lastAnalysis, window._lastGrade || '검토필요', window._lastFiles || []);
+  } catch(e) {
+    alert('Word 생성 오류: ' + e.message);
+  }
+  if (btnEl) { btnEl.disabled = false; btnEl.textContent = '📥 Word 다운로드'; }
+}
+
+async function generateDocx(analysisText, grade, fileNames) {
+  if (typeof docx === 'undefined') {
+    throw new Error('Word 라이브러리(docx)가 아직 로드되지 않았습니다. 페이지를 새로고침 후 다시 시도하세요.');
+  }
+  const date = new Date().toLocaleDateString('ko-KR');
+  const gradeColor = grade === '고위험' ? 'C0392B' : grade === '중위험' ? 'E67E22' : '27AE60';
+
+  const sections = parseAnalysisSections(analysisText);
+
+  const {
+    Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell,
+    AlignmentType, HeadingLevel, BorderStyle, WidthType, ShadingType,
+    VerticalAlign, Header, Footer, PageNumber, NumberFormat
+  } = window.docx;
+
+  const border = { style: BorderStyle.SINGLE, size: 1, color: 'D4DCE8' };
+  const borders = { top: border, bottom: border, left: border, right: border };
+
+  const makeHeading = (text, level) => new Paragraph({
+    heading: level,
+    spacing: { before: level === HeadingLevel.HEADING_1 ? 320 : 240, after: 120 },
+    children: [new TextRun({ text, bold: true, size: level === HeadingLevel.HEADING_1 ? 32 : level === HeadingLevel.HEADING_2 ? 26 : 24, font: 'Malgun Gothic', color: level === HeadingLevel.HEADING_1 ? '0A3D91' : '1A1A1A' })]
+  });
+
+  const makePara = (text, opts = {}) => new Paragraph({
+    spacing: { before: 60, after: 80 },
+    indent: opts.indent ? { left: 360 } : {},
+    children: [new TextRun({ text: text || '', size: 22, font: 'Malgun Gothic', color: opts.muted ? '5A6A80' : '0D1B2A', bold: opts.bold || false })]
+  });
+
+  const makeGradeBox = () => new Table({
+    width: { size: 9360, type: WidthType.DXA },
+    columnWidths: [1800, 7560],
+    rows: [
+      new TableRow({ children: [
+        new TableCell({ borders, width: { size: 1800, type: WidthType.DXA }, shading: { fill: '0A3D91', type: ShadingType.CLEAR },
+          margins: { top: 120, bottom: 120, left: 160, right: 160 },
+          children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: '위험등급', size: 22, bold: true, font: 'Malgun Gothic', color: 'FFFFFF' })] })] }),
+        new TableCell({ borders, width: { size: 7560, type: WidthType.DXA }, shading: { fill: gradeColor + '22', type: ShadingType.CLEAR },
+          margins: { top: 120, bottom: 120, left: 160, right: 160 },
+          children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: grade, size: 32, bold: true, font: 'Malgun Gothic', color: gradeColor })] })] }),
+      ]}),
+      new TableRow({ children: [
+        new TableCell({ borders, width: { size: 1800, type: WidthType.DXA }, shading: { fill: 'EEF1F8', type: ShadingType.CLEAR },
+          margins: { top: 80, bottom: 80, left: 160, right: 160 },
+          children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: '분석 대상', size: 20, font: 'Malgun Gothic', color: '5A6A80' })] })] }),
+        new TableCell({ borders, width: { size: 7560, type: WidthType.DXA },
+          margins: { top: 80, bottom: 80, left: 160, right: 160 },
+          children: [new Paragraph({ children: [new TextRun({ text: fileNames.join(', ') || '-', size: 20, font: 'Malgun Gothic' })] })] }),
+      ]}),
+      new TableRow({ children: [
+        new TableCell({ borders, width: { size: 1800, type: WidthType.DXA }, shading: { fill: 'EEF1F8', type: ShadingType.CLEAR },
+          margins: { top: 80, bottom: 80, left: 160, right: 160 },
+          children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: '분석 일자', size: 20, font: 'Malgun Gothic', color: '5A6A80' })] })] }),
+        new TableCell({ borders, width: { size: 7560, type: WidthType.DXA },
+          margins: { top: 80, bottom: 80, left: 160, right: 160 },
+          children: [new Paragraph({ children: [new TextRun({ text: date, size: 20, font: 'Malgun Gothic' })] })] }),
+      ]}),
+    ]
+  });
+
+  const make9RiskTable = (riskRows) => {
+    const risks = [
+      ['① 성능','의도된 성능기준 미충족 위험'],['② 공정성','차별적 결과물 도출 위험'],
+      ['③ 유해성','불법·사회윤리 위반 위험'],['④ 설명가능성','XAI 설명 불가 위험'],
+      ['⑤ 데이터보호','개인·기밀정보 유출 위험'],['⑥ 제3자위험','위수탁·외부서비스 위험'],
+      ['⑦ 사이버보안','적대적 공격·외부 위협'],['⑧ 통제가능성','인간감독·HITL 위험'],
+      ['⑨ 지식재산권','IP 침해 위험']
+    ];
+    const headerRow = new TableRow({ tableHeader: true, children: [
+      new TableCell({ borders, width:{size:1200,type:WidthType.DXA}, shading:{fill:'0A3D91',type:ShadingType.CLEAR}, margins:{top:80,bottom:80,left:120,right:120},
+        children:[new Paragraph({alignment:AlignmentType.CENTER,children:[new TextRun({text:'위험 유형',size:20,bold:true,font:'Malgun Gothic',color:'FFFFFF'})]})] }),
+      new TableCell({ borders, width:{size:2200,type:WidthType.DXA}, shading:{fill:'0A3D91',type:ShadingType.CLEAR}, margins:{top:80,bottom:80,left:120,right:120},
+        children:[new Paragraph({alignment:AlignmentType.CENTER,children:[new TextRun({text:'위험 내용',size:20,bold:true,font:'Malgun Gothic',color:'FFFFFF'})]})] }),
+      new TableCell({ borders, width:{size:1400,type:WidthType.DXA}, shading:{fill:'0A3D91',type:ShadingType.CLEAR}, margins:{top:80,bottom:80,left:120,right:120},
+        children:[new Paragraph({alignment:AlignmentType.CENTER,children:[new TextRun({text:'판정',size:20,bold:true,font:'Malgun Gothic',color:'FFFFFF'})]})] }),
+      new TableCell({ borders, width:{size:4560,type:WidthType.DXA}, shading:{fill:'0A3D91',type:ShadingType.CLEAR}, margins:{top:80,bottom:80,left:120,right:120},
+        children:[new Paragraph({alignment:AlignmentType.CENTER,children:[new TextRun({text:'근거 / 보완사항',size:20,bold:true,font:'Malgun Gothic',color:'FFFFFF'})]})] }),
+    ]});
+    const dataRows = risks.map(([name, desc], i) => {
+      const row = riskRows[i] || {};
+      const status = row.status || 'ok';
+      const fill = status==='detected'?'FDECEA':status==='warn'?'FFF8E1':'E6FAF5';
+      const statusText = status==='detected'?'⚠ 감지됨':status==='warn'?'△ 주의':'✔ 이상없음';
+      const statusColor = status==='detected'?'C0392B':status==='warn'?'E67E22':'27AE60';
+      return new TableRow({ children: [
+        new TableCell({ borders, width:{size:1200,type:WidthType.DXA}, shading:{fill:'EEF1F8',type:ShadingType.CLEAR}, margins:{top:70,bottom:70,left:120,right:120},
+          children:[new Paragraph({children:[new TextRun({text:name,size:20,bold:true,font:'Malgun Gothic'})]})] }),
+        new TableCell({ borders, width:{size:2200,type:WidthType.DXA}, margins:{top:70,bottom:70,left:120,right:120},
+          children:[new Paragraph({children:[new TextRun({text:desc,size:19,font:'Malgun Gothic',color:'5A6A80'})]})] }),
+        new TableCell({ borders, width:{size:1400,type:WidthType.DXA}, shading:{fill,type:ShadingType.CLEAR}, margins:{top:70,bottom:70,left:120,right:120},
+          verticalAlign:VerticalAlign.CENTER,
+          children:[new Paragraph({alignment:AlignmentType.CENTER,children:[new TextRun({text:statusText,size:19,bold:true,font:'Malgun Gothic',color:statusColor})]})] }),
+        new TableCell({ borders, width:{size:4560,type:WidthType.DXA}, margins:{top:70,bottom:70,left:120,right:120},
+          children:[new Paragraph({children:[new TextRun({text:row.detail||'-',size:19,font:'Malgun Gothic'})]})] }),
+      ]});
+    });
+    return new Table({ width:{size:9360,type:WidthType.DXA}, columnWidths:[1200,2200,1400,4560], rows:[headerRow,...dataRows] });
+  };
+
+  const makeCheckTable = (items) => {
+    if (!items || items.length === 0) return makePara('체크리스트 항목 없음', {muted:true});
+    const headerRow = new TableRow({ tableHeader:true, children:[
+      new TableCell({borders,width:{size:800,type:WidthType.DXA},shading:{fill:'0A3D91',type:ShadingType.CLEAR},margins:{top:80,bottom:80,left:120,right:120},children:[new Paragraph({alignment:AlignmentType.CENTER,children:[new TextRun({text:'구분',size:19,bold:true,font:'Malgun Gothic',color:'FFFFFF'})]})]}),
+      new TableCell({borders,width:{size:5760,type:WidthType.DXA},shading:{fill:'0A3D91',type:ShadingType.CLEAR},margins:{top:80,bottom:80,left:120,right:120},children:[new Paragraph({children:[new TextRun({text:'평가 항목',size:19,bold:true,font:'Malgun Gothic',color:'FFFFFF'})]})] }),
+      new TableCell({borders,width:{size:1200,type:WidthType.DXA},shading:{fill:'0A3D91',type:ShadingType.CLEAR},margins:{top:80,bottom:80,left:120,right:120},children:[new Paragraph({alignment:AlignmentType.CENTER,children:[new TextRun({text:'판정',size:19,bold:true,font:'Malgun Gothic',color:'FFFFFF'})]})]}),
+      new TableCell({borders,width:{size:1600,type:WidthType.DXA},shading:{fill:'0A3D91',type:ShadingType.CLEAR},margins:{top:80,bottom:80,left:120,right:120},children:[new Paragraph({children:[new TextRun({text:'관련 조항',size:19,bold:true,font:'Malgun Gothic',color:'FFFFFF'})]})] }),
+    ]});
+    const rows = items.map((item, idx) => {
+      const fill = item.status==='Y'?'E6FAF5':item.status==='N'?'FDECEA':item.status==='△'?'FFF8E1':'F5F5F5';
+      const color = item.status==='Y'?'27AE60':item.status==='N'?'C0392B':item.status==='△'?'E67E22':'888888';
+      return new TableRow({ children:[
+        new TableCell({borders,width:{size:800,type:WidthType.DXA},shading:{fill:'EEF1F8',type:ShadingType.CLEAR},margins:{top:70,bottom:70,left:120,right:120},children:[new Paragraph({alignment:AlignmentType.CENTER,children:[new TextRun({text:String(idx+1),size:19,font:'Malgun Gothic'})]})] }),
+        new TableCell({borders,width:{size:5760,type:WidthType.DXA},margins:{top:70,bottom:70,left:120,right:120},children:[new Paragraph({children:[new TextRun({text:item.text||'',size:19,font:'Malgun Gothic'})]})] }),
+        new TableCell({borders,width:{size:1200,type:WidthType.DXA},shading:{fill,type:ShadingType.CLEAR},margins:{top:70,bottom:70,left:120,right:120},children:[new Paragraph({alignment:AlignmentType.CENTER,children:[new TextRun({text:item.status||'-',size:19,bold:true,font:'Malgun Gothic',color})]})]}),
+        new TableCell({borders,width:{size:1600,type:WidthType.DXA},margins:{top:70,bottom:70,left:120,right:120},children:[new Paragraph({children:[new TextRun({text:item.law||'-',size:18,font:'Malgun Gothic',color:'5A6A80'})]})] }),
+      ]});
+    });
+    return new Table({width:{size:9360,type:WidthType.DXA},columnWidths:[800,5760,1200,1600],rows:[headerRow,...rows]});
+  };
+
+  // 9대 위험 항목 파싱
+  const risk9Names = ['성능','공정성','유해성','설명가능성','데이터보호','제3자위험','사이버보안','통제가능성','지식재산권'];
+  const risk9Rows = risk9Names.map(name => {
+    const detected = analysisText.includes(name) && (analysisText.includes('감지') || analysisText.includes('위험') || analysisText.includes('주의') || analysisText.includes('필요'));
+    const lineMatch = analysisText.match(new RegExp(`.{0,120}${name}.{0,120}`, 'g'));
+    const detail = lineMatch ? lineMatch[0].replace(/[#*]/g,'').trim().slice(0,80) : '-';
+    return { status: detected ? 'detected' : 'ok', detail };
+  });
+
+  // 체크리스트 파싱
+  const checkItems = [];
+  analysisText.split('\n').forEach(line => {
+    const m = line.match(/[\[【]([YN△N\/A✔✗⚠])[】\]]\s*(.+)/);
+    if (m) {
+      const lawM = line.match(/(AI기본법|신용정보법|개인정보|금융소비자|시행령)[^\s,。]{0,30}/);
+      checkItems.push({ status: m[1]==='✔'?'Y':m[1]==='✗'?'N':m[1], text: m[2].trim().slice(0,80), law: lawM?lawM[0]:'-' });
+    }
+  });
+
+  // 문서 본문 구성
+  const bodyChildren = [
+    new Paragraph({ alignment: AlignmentType.CENTER, spacing:{before:0,after:280},
+      children: [new TextRun({text:'iM AI Governance Management', size:24, font:'Malgun Gothic', color:'0A3D91'})] }),
+    new Paragraph({ alignment: AlignmentType.CENTER, spacing:{before:0,after:80},
+      children: [new TextRun({text:'AI 서비스 위험평가 분석 보고서', size:40, bold:true, font:'Malgun Gothic', color:'0D1B2A'})] }),
+    new Paragraph({ alignment: AlignmentType.CENTER, spacing:{before:0,after:400},
+      children: [new TextRun({text:'AI기본법 · 금융분야 AI 개발·활용 안내서 준거', size:20, font:'Malgun Gothic', color:'5A6A80'})] }),
+    makeGradeBox(),
+    new Paragraph({spacing:{before:400,after:0}}),
+  ];
+
+  sections.forEach(sec => {
+    if (!sec.title) return;
+    bodyChildren.push(makeHeading(sec.title, sec.level === 1 ? HeadingLevel.HEADING_1 : HeadingLevel.HEADING_2));
+
+    if (sec.title.includes('9대 위험') || sec.title.includes('위험 분석')) {
+      bodyChildren.push(make9RiskTable(risk9Rows));
+      bodyChildren.push(new Paragraph({spacing:{before:160,after:0}}));
+    } else if ((sec.title.includes('체크리스트') || sec.title.includes('법령 준수')) && checkItems.length > 0) {
+      bodyChildren.push(makeCheckTable(checkItems));
+      bodyChildren.push(new Paragraph({spacing:{before:160,after:0}}));
+    } else {
+      sec.lines.forEach(line => {
+        if (!line.trim()) return;
+        const isBullet = line.match(/^[-•·▪▫◦]\s/);
+        const isNum = line.match(/^[\d①②③④⑤⑥⑦⑧⑨\-]\./);
+        bodyChildren.push(new Paragraph({
+          spacing:{before:60,after:60},
+          indent: (isBullet||isNum) ? {left:360} : {},
+          children:[new TextRun({text:line.replace(/^[-•·▪▫◦]\s/,'').replace(/\*\*/g,'').trim(), size:22, font:'Malgun Gothic',
+            bold: line.includes('**') || line.startsWith('▶') || line.startsWith('●'),
+            color: '0D1B2A'})]
+        }));
+      });
+    }
+  });
+
+  // 법령 참고 표 (푸터 위)
+  bodyChildren.push(makeHeading('참고 법령 및 가이드라인', HeadingLevel.HEADING_1));
+  const lawData = [
+    ['AI 기본법 제31조','사전 고지·표시 의무 (생성형 AI, 고영향 AI)'],
+    ['AI 기본법 제34조','고영향 AI 사업자 책무 (위험관리·이용자보호·설명제공)'],
+    ['AI 기본법 시행령 제24조','설명 제공 방법 및 절차'],
+    ['신용정보법 제36조의2','자동화평가 결과에 대한 설명 및 이의제기'],
+    ['개인정보보호법 제37조의2','자동화된 결정에 대한 정보주체의 권리'],
+    ['금융소비자보호법 제15조','차별 금지'],
+    ['금융분야 AI 개발·활용 안내서','금융위원회, AI 9대 위험 및 평가 기준'],
+  ];
+  const lawHeaderRow = new TableRow({ tableHeader:true, children:[
+    new TableCell({borders,width:{size:2800,type:WidthType.DXA},shading:{fill:'0A3D91',type:ShadingType.CLEAR},margins:{top:80,bottom:80,left:120,right:120},children:[new Paragraph({children:[new TextRun({text:'법령·가이드라인',size:20,bold:true,font:'Malgun Gothic',color:'FFFFFF'})]})] }),
+    new TableCell({borders,width:{size:6560,type:WidthType.DXA},shading:{fill:'0A3D91',type:ShadingType.CLEAR},margins:{top:80,bottom:80,left:120,right:120},children:[new Paragraph({children:[new TextRun({text:'주요 내용',size:20,bold:true,font:'Malgun Gothic',color:'FFFFFF'})]})] }),
+  ]});
+  const lawRows = lawData.map(([law, desc]) => new TableRow({ children:[
+    new TableCell({borders,width:{size:2800,type:WidthType.DXA},shading:{fill:'EEF1F8',type:ShadingType.CLEAR},margins:{top:70,bottom:70,left:120,right:120},children:[new Paragraph({children:[new TextRun({text:law,size:19,bold:true,font:'Malgun Gothic',color:'0A3D91'})]})] }),
+    new TableCell({borders,width:{size:6560,type:WidthType.DXA},margins:{top:70,bottom:70,left:120,right:120},children:[new Paragraph({children:[new TextRun({text:desc,size:19,font:'Malgun Gothic'})]})] }),
+  ]}));
+  bodyChildren.push(new Table({width:{size:9360,type:WidthType.DXA},columnWidths:[2800,6560],rows:[lawHeaderRow,...lawRows]}));
+
+  const doc = new Document({
+    styles: {
+      default: { document: { run: { font:'Malgun Gothic', size:22 } } },
+      paragraphStyles: [
+        { id:'Heading1', name:'Heading 1', basedOn:'Normal', next:'Normal', quickFormat:true,
+          run:{size:32,bold:true,font:'Malgun Gothic',color:'0A3D91'},
+          paragraph:{spacing:{before:320,after:120},outlineLevel:0} },
+        { id:'Heading2', name:'Heading 2', basedOn:'Normal', next:'Normal', quickFormat:true,
+          run:{size:26,bold:true,font:'Malgun Gothic',color:'1A1A1A'},
+          paragraph:{spacing:{before:240,after:100},outlineLevel:1} },
+      ]
+    },
+    sections: [{
+      properties: { page: { size:{width:12240,height:17280}, margin:{top:1134,right:1134,bottom:1134,left:1134} } },
+      headers: { default: new Header({ children:[
+        new Paragraph({ alignment:AlignmentType.RIGHT, border:{bottom:{style:BorderStyle.SINGLE,size:1,color:'D4DCE8',space:1}},
+          children:[new TextRun({text:'iM AI Governance Management — AI 위험평가 분석 보고서',size:18,font:'Malgun Gothic',color:'5A6A80'})] })
+      ]})},
+      footers: { default: new Footer({ children:[
+        new Paragraph({ alignment:AlignmentType.CENTER, border:{top:{style:BorderStyle.SINGLE,size:1,color:'D4DCE8',space:1}},
+          children:[
+            new TextRun({text:'AI기본법 · 금융분야 AI 개발·활용 안내서 준거  —  ',size:18,font:'Malgun Gothic',color:'5A6A80'}),
+            new TextRun({children:[PageNumber.CURRENT],size:18,font:'Malgun Gothic',color:'0A3D91'}),
+            new TextRun({text:' / ',size:18,font:'Malgun Gothic',color:'5A6A80'}),
+            new TextRun({children:[PageNumber.TOTAL_PAGES],size:18,font:'Malgun Gothic',color:'0A3D91'}),
+          ] })
+      ]})},
+      children: bodyChildren
+    }]
+  });
+
+  const buffer = await Packer.toBuffer(doc);
+  const blob = new Blob([buffer], {type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = `iM_AI위험평가보고서_${new Date().toISOString().slice(0,10)}.docx`;
+  a.click();
+}
+
+function parseAnalysisSections(text) {
+  const lines = text.split('\n');
+  const sections = [];
+  let current = null;
+  lines.forEach(line => {
+    const h1 = line.match(/^#{1,2}\s+(.+)/);
+    const h2 = line.match(/^#{3,4}\s+(.+)/);
+    const numHeader = line.match(/^(\d+)\.\s+(.+)/);
+    if (h1) {
+      if (current) sections.push(current);
+      current = { title: h1[1].trim(), level: 1, lines: [] };
+    } else if (h2) {
+      if (current) sections.push(current);
+      current = { title: h2[1].trim(), level: 2, lines: [] };
+    } else if (numHeader && numHeader[1] <= '9' && line.length < 60) {
+      if (current) sections.push(current);
+      current = { title: numHeader[2].trim(), level: 1, lines: [] };
+    } else {
+      if (!current) current = { title:'분석 결과', level:1, lines:[] };
+      if (line.trim()) current.lines.push(line);
+    }
+  });
+  if (current) sections.push(current);
+  return sections;
+}
+
+function readAsBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => resolve(e.target.result.split(',')[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+function readAsText(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => resolve(e.target.result);
+    reader.onerror = reject;
+    reader.readAsText(file, 'utf-8');
+  });
+}
+
+async function analyzeDocuments() {
+  if (!apiKey) { alert('API 키를 먼저 설정하세요.'); showPage('settings'); return; }
+  if (uploadedFiles.length === 0) { alert('분석할 문서를 업로드하세요.'); return; }
+
+  const analysisType = document.getElementById('analysis-type').value;
+  const stage = document.getElementById('analysis-stage').value;
+  const context = document.getElementById('analysis-context').value;
+  const btn = document.getElementById('analyze-btn');
+  const progressEl = document.getElementById('analyze-progress');
+  const statusEl = document.getElementById('analyze-status');
+  const fillEl = document.getElementById('analyze-fill');
+  const resultsEl = document.getElementById('docreview-results');
+
+  btn.disabled = true;
+  progressEl.style.display = 'block';
+  resultsEl.innerHTML = '<div class="card" style="text-align:center;padding:20px;"><div style="font-size:13px;font-weight:700;color:var(--primary);">🤖 AI가 문서를 분석 중입니다...</div></div>';
+
+  try {
+    // 1단계: 파일 읽기
+    statusEl.textContent = '문서 읽는 중...';
+    fillEl.style.width = '15%';
+    const fileContents = [];
+    for (const file of uploadedFiles) {
+      const ext = file.name.split('.').pop().toLowerCase();
+      let content;
+      try {
+        if (ext === 'pdf') {
+          const b64 = await readAsBase64(file);
+          fileContents.push({ name: file.name, type: 'pdf', content: b64 });
+        } else {
+          content = await readAsText(file).catch(async () => {
+            // binary fallback
+            return `[파일명: ${file.name} — 텍스트 추출 불가, 파일명 기반 분석]`;
+          });
+          // 텍스트가 너무 길면 앞부분만
+          if (content.length > 15000) content = content.slice(0, 15000) + '\n\n... [내용 일부 생략 — 앞부분 기준 분석]';
+          fileContents.push({ name: file.name, type: 'text', content });
+        }
+      } catch(e) {
+        fileContents.push({ name: file.name, type: 'text', content: `[읽기 오류: ${e.message}]` });
+      }
+    }
+
+    // 2단계: Claude API 호출 구성
+    statusEl.textContent = 'Claude AI에게 분석 요청 중...';
+    fillEl.style.width = '40%';
+
+    const typePrompts = {
+      full: `다음 AI 서비스 관련 문서를 AI기본법 및 금융분야 AI 개발·활용 안내서 기준으로 종합 위험평가하세요.
+
+반드시 다음 순서로 작성하세요:
+
+## 1. 문서 요약
+(문서의 핵심 내용을 3-5줄로 요약)
+
+## 2. AI 서비스 여부 판단
+(자율성·적응성·결과물·활용성 4요건 기준으로 판단)
+
+## 3. 위험등급 판단
+- 판정: [고위험 / 중위험 / 저위험]
+- 근거: (AI기본법 조항 명시하여 구체적 근거 제시)
+
+## 4. AI 9대 위험 분석
+각 위험 항목별로 [감지됨 / 주의 / 이상없음] 으로 판단하고 근거를 제시:
+① 성능 위험 | ② 공정성 위험 | ③ 유해성 위험 | ④ 설명가능성 위험
+⑤ 데이터보호 위험 | ⑥ 제3자 위험 | ⑦ 사이버보안 위험
+⑧ 통제가능성 위험 | ⑨ 지식재산권 위험
+
+## 5. 법령 준수 검토
+(AI기본법 제31조·제34조, 신용정보법 제36조의2 등 적용 조항 명시)
+
+## 6. 보완 필요 사항 (우선순위 순)
+(즉시 조치 / 단기 / 중장기로 구분하여 작성)
+
+## 7. 종합 의견`,
+      grade: `다음 문서를 읽고 AI기본법 기준으로 위험등급만 판단하세요.
+고영향 AI 여부(채용·대출심사), 생성형 AI 여부, 소비자 권익 영향을 검토하여
+[고위험 / 중위험 / 저위험] 중 하나로 판정하고 핵심 근거를 제시하세요.`,
+      checklist: `다음 문서를 읽고 ${stage} 단계 위험평가 체크리스트 항목을 추출하세요.
+각 항목에 대해 문서에서 확인된 내용([Y] 충족 / [N] 미충족 / [△] 부분충족 / [N/A])을 판단하고
+관련 AI기본법 조항을 명시하세요.`,
+      law: `다음 문서를 읽고 적용되는 법령 조항을 매핑하세요.
+AI기본법, 신용정보법, 개인정보보호법, 금융소비자보호법, 금융분야 AI 안내서 기준으로
+각 법령별로 적용 여부와 핵심 요건을 정리하세요.`,
+      gap: `다음 문서를 읽고 현황과 AI기본법·금융분야 AI 안내서 요건 간의 GAP을 분석하세요.
+현재 문서에 포함된 내용과 법령상 반드시 갖춰야 할 요건을 비교하여
+충족/미충족/부분충족으로 구분하고 보완 방향을 제시하세요.`
+    };
+
+    const systemDoc = `${SYSTEM_PROMPT}
+
+당신은 업로드된 AI 서비스 관련 문서를 분석하는 전문가입니다.
+문서 내용을 정확히 읽고 실제 내용에 근거한 분석만 수행하세요.
+추측이나 일반론이 아닌, 문서에서 확인된 사실을 바탕으로 구체적으로 작성하세요.`;
+
+    // 메시지 구성 — PDF는 document 타입, 텍스트는 text 타입
+    const userContent = [];
+    for (const fc of fileContents) {
+      if (fc.type === 'pdf') {
+        userContent.push({ type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: fc.content } });
+      } else {
+        userContent.push({ type: 'text', text: `\n\n=== 파일: ${fc.name} ===\n${fc.content}` });
+      }
+    }
+    const instruction = typePrompts[analysisType] || typePrompts.full;
+    userContent.push({ type: 'text', text: `\n\n분석 단계: ${stage}\n추가 컨텍스트: ${context || '없음'}\n\n${instruction}` });
+
+    statusEl.textContent = 'Claude AI 분석 중 (30~60초 소요)...';
+    fillEl.style.width = '60%';
+
+    // API 호출
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: modelId,
+        max_tokens: 3000,
+        system: systemDoc,
+        messages: [{ role: 'user', content: userContent }]
+      })
+    });
+
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({}));
+      throw new Error(err.error?.message || `API 오류 (${resp.status})`);
+    }
+
+    statusEl.textContent = '결과 처리 중...';
+    fillEl.style.width = '90%';
+
+    const data = await resp.json();
+    const analysis = data.content[0].text;
+
+    fillEl.style.width = '100%';
+    statusEl.textContent = '분석 완료!';
+
+    // 위험등급 추출
+    const gradeMatch = analysis.match(/고위험|중위험|저위험/);
+    const detectedGrade = gradeMatch ? gradeMatch[0] : '검토필요';
+    const gradeClass = detectedGrade === '고위험' ? 'high' : detectedGrade === '중위험' ? 'mid' : 'low';
+    const gradeColor = detectedGrade === '고위험' ? 'var(--red)' : detectedGrade === '중위험' ? 'var(--yellow)' : 'var(--green)';
+
+    // 9대 위험 감지
+    const risks9 = [
+      {name:'성능', kw:['성능','정확도','오작동','오류','품질']},
+      {name:'공정성', kw:['공정','차별','편향','bias','불균형']},
+      {name:'유해성', kw:['유해','불법','윤리','악용','오용']},
+      {name:'설명가능성', kw:['설명','XAI','SHAP','LIME','투명']},
+      {name:'데이터보호', kw:['개인정보','데이터','프라이버시','유출','보호']},
+      {name:'제3자위험', kw:['위수탁','외부','벤더','제3자','협력']},
+      {name:'사이버보안', kw:['보안','해킹','공격','취약','침해']},
+      {name:'통제가능성', kw:['통제','HITL','인간검토','중단','감독']},
+      {name:'지식재산권', kw:['저작권','IP','지식재산','라이선스']}
+    ];
+    const lowerAnalysis = analysis.toLowerCase();
+    const risk9Results = risks9.map(r => {
+      const found = r.kw.some(k => analysis.includes(k));
+      const detected = analysis.includes(r.name) && (analysis.includes('위험') || analysis.includes('감지') || analysis.includes('주의') || analysis.includes('필요'));
+      return { ...r, status: detected ? 'detected' : found ? 'warn' : 'ok' };
+    });
+
+    // 결과 렌더링
+    resultsEl.innerHTML = `
+      <div class="risk-result-card ${gradeClass}">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+          <div style="font-size:32px;font-weight:900;color:${gradeColor}">${detectedGrade}</div>
+          <div>
+            <div style="font-size:13px;font-weight:700;">AI 위험등급 판정 결과</div>
+            <div style="font-size:11px;color:var(--muted);">분석 파일: ${uploadedFiles.map(f=>f.name).join(', ')}</div>
+          </div>
+          <div style="margin-left:auto;display:flex;gap:6px;">
+            <button class="btn btn-o btn-sm" onclick="copyAnalysis()">📋 복사</button>
+            <button class="btn btn-p btn-sm" onclick="downloadAnalysis()" style="background:#1155CC;">📥 Word 다운로드</button>
+            <button class="btn btn-a btn-sm" onclick="registerFromAnalysis('${detectedGrade}')">➕ 서비스 등록</button>
+          </div>
+        </div>
+        <div class="nine-risk-grid">
+          ${risk9Results.map(r => `
+            <div class="nine-risk-item ${r.status}">
+              <div class="ri-name">${r.status==='detected'?'⚠':'✓'} ${r.name}</div>
+              <div class="ri-desc">${r.status==='detected'?'위험 감지됨':r.status==='warn'?'검토 권고':'이상 없음'}</div>
+            </div>`).join('')}
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🤖 Claude AI 위험평가 상세 결과 <span class="law">${new Date().toLocaleDateString('ko-KR')}</span></div>
+        <div class="stream-output" id="analysis-output">${analysis.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>').replace(/## (.+)/g,'<strong style="font-size:13px;display:block;margin:10px 0 4px;color:var(--primary)">## $1</strong>')}</div>
+      </div>`;
+
+    // 이력 저장
+    const histItem = {
+      id: Date.now(),
+      files: uploadedFiles.map(f => f.name),
+      grade: detectedGrade,
+      type: analysisType,
+      stage,
+      date: new Date().toLocaleDateString('ko-KR'),
+      analysis
+    };
+    analysisHistory.unshift(histItem);
+    if (analysisHistory.length > 20) analysisHistory.pop();
+    localStorage.setItem('im_analysis_history', JSON.stringify(analysisHistory));
+    renderAnalysisHistory();
+    window._lastAnalysis = analysis;
+    window._lastGrade = detectedGrade;
+    window._lastFiles = uploadedFiles.map(f => f.name);
+
+  } catch(e) {
+    resultsEl.innerHTML = `<div class="card"><div class="alert ar"><span>✗</span><span>분석 오류: ${e.message}</span></div></div>`;
+  }
+
+  progressEl.style.display = 'none';
+  btn.disabled = false;
+}
+
+function copyAnalysis() {
+  navigator.clipboard.writeText(window._lastAnalysis || '').then(() => alert('분석 결과가 클립보드에 복사되었습니다.'));
+}
+function downloadAnalysis() {
+  const blob = new Blob([window._lastAnalysis || ''], {type:'text/plain;charset=utf-8'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = `AI_위험평가_${new Date().toISOString().slice(0,10)}.txt`;
+  a.click();
+}
+function registerFromAnalysis(grade) {
+  document.getElementById('reg-name').value = uploadedFiles[0]?.name.replace(/\.[^.]+$/,'') || '';
+  const gradeToCategory = {'고위험':'여신·신용평가 (고영향 AI)', '중위험':'이상거래탐지 (FDS)', '저위험':'내부업무 자동화'};
+  document.getElementById('reg-category').value = gradeToCategory[grade] || '';
+  document.getElementById('reg-desc').value = window._lastAnalysis?.slice(0,300) || '';
+  showPage('register');
+  alert('분석 결과를 서비스 등록 양식에 반영했습니다. 내용을 확인하고 등록하세요.');
+}
+
+function renderAnalysisHistory() {
+  const el = document.getElementById('analysis-history');
+  if (!el) return;
+  if (analysisHistory.length === 0) {
+    el.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:12px;padding:10px;">분석 이력이 없습니다.</div>';
+    return;
+  }
+  const gradeColor = {'고위험':'var(--red)','중위험':'var(--yellow)','저위험':'var(--green)','검토필요':'var(--muted)'};
+  el.innerHTML = `<div class="tw"><table>
+    <thead><tr><th>분석일</th><th>파일명</th><th>분석유형</th><th>단계</th><th>판정등급</th><th>작업</th></tr></thead>
+    <tbody>
+    ${analysisHistory.map(h => `<tr>
+      <td class="mono" style="font-size:10.5px">${h.date}</td>
+      <td style="font-size:10.5px">${h.files.join(', ')}</td>
+      <td><span class="chip">${h.type}</span></td>
+      <td><span class="chip">${h.stage}</span></td>
+      <td><span style="font-weight:700;color:${gradeColor[h.grade]||'var(--muted)'}">${h.grade}</span></td>
+      <td><button class="btn btn-o btn-sm" onclick="viewHistory(${h.id})">보기</button></td>
+    </tr>`).join('')}
+    </tbody></table></div>`;
+}
+
+function viewHistory(id) {
+  const h = analysisHistory.find(x => x.id === id);
+  if (!h) return;
+  window._lastAnalysis = h.analysis;
+  window._lastGrade = h.grade;
+  window._lastFiles = h.files;
+  const gradeClass = h.grade === '고위험' ? 'high' : h.grade === '중위험' ? 'mid' : 'low';
+  const gradeColor = h.grade === '고위험' ? 'var(--red)' : h.grade === '중위험' ? 'var(--yellow)' : 'var(--green)';
+  document.getElementById('docreview-results').innerHTML = `
+    <div class="risk-result-card ${gradeClass}">
+      <div style="font-size:26px;font-weight:900;color:${gradeColor};margin-bottom:6px;">${h.grade}</div>
+      <div style="font-size:11px;color:var(--muted);">${h.date} | ${h.files.join(', ')}</div>
+    </div>
+    <div class="card">
+      <div class="card-title">📋 저장된 분석 결과</div>
+      <div class="stream-output">${h.analysis.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>').replace(/## (.+)/g,'<strong style="font-size:13px;display:block;margin:10px 0 4px;color:var(--primary)">## $1</strong>')}</div>
+      <div style="display:flex;gap:7px;margin-top:10px;">
+        <button class="btn btn-o btn-sm" onclick="copyAnalysis()">📋 복사</button>
+        <button class="btn btn-p btn-sm" onclick="downloadAnalysis()">📥 Word 다운로드</button>
+      </div>
+    </div>`;
+}
+
+// ── INIT ──────────────────────────────────────────────────────
+(function init() {
+  if (apiKey) {
+    updateApiStatus(true);
+    document.getElementById('api-key-input').value = apiKey;
+    document.getElementById('analyze-btn').disabled = uploadedFiles.length === 0;
+  } else {
+    updateApiStatus(false);
+    document.getElementById('api-warning').style.display = 'flex';
+  }
+  const savedModel = localStorage.getItem('im_model');
+  if (savedModel) {
+    const sel = document.getElementById('model-select');
+    if (sel) sel.value = savedModel;
+  }
+  // ── 데모 서비스 자동 주입 (localStorage 비어있을 때만) ──────
+  if (services.length === 0) {
+    const today = new Date().toLocaleDateString('ko-KR');
+    services = [
+      {
+        id: 'demo-001',
+        name: 'iM 신용평가 AI',
+        category: '여신·신용평가 (고영향 AI)',
+        aitype: '비생성형 AI (분류·예측·추천)',
+        biztype: '인공지능이용사업자 (외부 AI 활용)',
+        stage: '기획',
+        desc: '개인 신용정보를 기반으로 대출 심사 및 여신 가부를 결정하는 AI 시스템. 고객의 금융거래 이력, 소득 수준, 상환 능력 등을 분석하여 신용등급을 산출합니다.',
+        grade: '고위험',
+        createdAt: today,
+        checklistDone: 4, checklistTotal: 10, status: '검토중',
+        checklistData: {
+          '기획': {
+            '1.1.1': { result: 'Y', note: 'AI 윤리원칙 기반 개발 계획 수립', updatedAt: today },
+            '2.1.1': { result: 'Y', note: 'AI 거버넌스 매뉴얼 III장 기준 수립', updatedAt: today },
+            '2.4.1': { result: '보완필요', note: 'XAI 적용 방안 추가 검토 필요', updatedAt: today },
+            '2.5.1': { result: 'N', note: '사전 고지 문구 미수립', updatedAt: today }
+          }
+        }
+      },
+      {
+        id: 'demo-002',
+        name: 'iM 챗봇 AI',
+        category: '고객서비스·챗봇',
+        aitype: '생성형 AI (LLM·이미지·음성)',
+        biztype: '인공지능이용사업자 (외부 AI 활용)',
+        stage: '운영',
+        desc: '고객 문의에 자동으로 응답하는 생성형 AI 챗봇. 금융 상품 안내, 계좌 조회, 민원 접수 등 다양한 상담 업무를 처리합니다.',
+        grade: '중위험',
+        createdAt: today,
+        checklistDone: 8, checklistTotal: 8, status: '승인완료',
+        checklistData: {
+          '운영': {
+            '1.1.1': { result: 'Y', note: '재평가 불필요 확인', updatedAt: today },
+            '2.1.1': { result: 'Y', note: '정기 성능 모니터링 수행 중', updatedAt: today },
+            '2.3.1': { result: 'Y', note: '유해성 모니터링 정상', updatedAt: today },
+            '2.4.1': { result: 'Y', note: '개인정보 유출 이상 없음', updatedAt: today }
+          }
+        }
+      },
+      {
+        id: 'demo-003',
+        name: '마케팅 개인화 AI',
+        category: '마케팅·상품추천',
+        aitype: '비생성형 AI (분류·예측·추천)',
+        biztype: '인공지능이용사업자 (외부 AI 활용)',
+        stage: '개발',
+        desc: '고객 행동 데이터를 분석하여 맞춤형 금융 상품을 추천하는 AI. 거래 패턴, 관심 상품, 생애 주기 등을 고려하여 개인화된 상품 추천을 제공합니다.',
+        grade: '중위험',
+        createdAt: today,
+        checklistDone: 5, checklistTotal: 9, status: '검토중',
+        checklistData: {
+          '개발': {
+            '1.1.1': { result: 'Y', note: '개발 요건 검토 완료', updatedAt: today },
+            '4.1.1': { result: 'Y', note: 'F1-score 기준 성능 평가 완료', updatedAt: today },
+            '4.2.1': { result: '보완필요', note: 'PSI 0.22 — 임계치 접근, 추가 검토 필요', updatedAt: today }
+          }
+        }
+      },
+      {
+        id: 'demo-004',
+        name: '채용 스크리닝 AI',
+        category: '채용·인사평가 (고영향 AI)',
+        aitype: '비생성형 AI (분류·예측·추천)',
+        biztype: '인공지능개발사업자 (직접 개발)',
+        stage: '기획',
+        desc: '입사 지원자 서류를 자동 분류하고 적격 여부를 스크리닝하는 AI. 지원자 정보를 프로파일링하여 직무 적합도를 점수화합니다.',
+        grade: '고위험',
+        createdAt: today,
+        checklistDone: 2, checklistTotal: 10, status: '보완필요',
+        checklistData: {
+          '기획': {
+            '1.1.1': { result: 'Y', note: '윤리원칙 검토 완료', updatedAt: today },
+            '2.5.1': { result: 'N', note: 'AI 기반 운용 사실 사전 고지 방안 미수립 — AI기본법 제31조 위반 소지', updatedAt: today }
+          }
+        }
+      },
+      {
+        id: 'demo-005',
+        name: '내부문서 요약 AI',
+        category: '내부업무 자동화',
+        aitype: '생성형 AI (LLM·이미지·음성)',
+        biztype: '인공지능이용사업자 (외부 AI 활용)',
+        stage: '운영',
+        desc: '임직원 업무 효율화를 위한 내부 문서 요약·정리 AI. 회의록, 보고서, 정책 문서 등을 자동 요약하여 핵심 내용을 제공합니다. 내부 업무 전용으로 운영됩니다.',
+        grade: '저위험',
+        createdAt: today,
+        checklistDone: 6, checklistTotal: 6, status: '승인완료',
+        checklistData: {}
+      }
+    ];
+    saveServices();
+  }
+
+  updateDashboard();
+  populateServiceSelects();
+  updateStorageInfo();
+  renderAnalysisHistory();
+  setInterval(updateStorageInfo, 5000);
+})();
+</script>
+</body>
+</html>
