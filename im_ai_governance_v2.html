@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>iM AI 거버넌스 시스템 v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=IBM+Plex+Mono:wght@400;600&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #0A3D91;
+  --primary-light: #1155CC;
+  --accent: #FF6B00;
+  --accent2: #00C9A7;
+  --bg: #F2F5FA;
+  --surface: #FFFFFF;
+  --surface2: #EEF1F8;
+  --text: #0D1B2A;
+  --text-muted: #5A6A80;
+  --border: #D4DCE8;
+  --risk-low: #00C9A7;
+  --risk-mid: #F5A623;
+  --risk-high: #E8453C;
+  --risk-critical: #8B1A1A;
+  --sidebar-w: 248px;
+  --header-h: 58px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);display:flex;height:100vh;overflow:hidden;}
+
+/* SIDEBAR */
+.sidebar{width:var(--sidebar-w);background:var(--primary);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;}
+.sidebar-logo{padding:18px 16px 14px;border-bottom:1px solid rgba(255,255,255,0.1);}
+.sidebar-logo .brand{font-family:'Bebas Neue',sans-serif;font-size:21px;color:#fff;letter-spacing:1px;line-height:1;}
+.sidebar-logo .sub{font-size:9px;color:rgba(255,255,255,0.5);margin-top:3px;letter-spacing:0.4px;line-height:1.5;}
+.sidebar-section-label{font-size:9px;font-weight:700;color:rgba(255,255,255,0.38);letter-spacing:1.8px;padding:14px 16px 5px;text-transform:uppercase;}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 16px;color:rgba(255,255,255,0.72);font-size:12.5px;cursor:pointer;border-left:3px solid transparent;transition:all 0.13s;}
+.nav-item:hover{background:rgba(255,255,255,0.08);color:#fff;}
+.nav-item.active{background:rgba(255,255,255,0.13);color:#fff;border-left-color:var(--accent);font-weight:500;}
+.nav-item .icon{font-size:14px;width:17px;text-align:center;}
+.sidebar-footer{margin-top:auto;padding:12px 16px;border-top:1px solid rgba(255,255,255,0.1);font-size:10px;color:rgba(255,255,255,0.35);line-height:1.6;}
+
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.topbar{height:var(--header-h);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 22px;gap:10px;flex-shrink:0;}
+.topbar-title{font-size:14.5px;font-weight:700;color:var(--text);}
+.topbar-breadcrumb{font-size:11px;color:var(--text-muted);}
+.topbar-spacer{flex:1;}
+.badge{font-size:9.5px;font-weight:700;padding:3px 8px;border-radius:20px;letter-spacing:0.2px;}
+.badge-law{background:#E8F0FE;color:var(--primary);}
+.badge-ai{background:#FFF3E0;color:#E65100;}
+.topbar-user{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-muted);}
+.avatar{width:28px;height:28px;border-radius:50%;background:var(--primary);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+.content{flex:1;overflow-y:auto;padding:18px 22px;display:flex;flex-direction:column;gap:14px;}
+
+/* PAGES */
+.page{display:none;flex-direction:column;gap:14px;}
+.page.active{display:flex;}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 18px;}
+.card-title{font-size:12.5px;font-weight:700;color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:7px;flex-wrap:wrap;}
+.law-ref{font-family:'IBM Plex Mono',monospace;font-size:9.5px;background:#E8F0FE;color:var(--primary);padding:2px 6px;border-radius:4px;font-weight:600;}
+
+/* GRID */
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.grid-70-30{display:grid;grid-template-columns:7fr 3fr;gap:10px;}
+.grid-60-40{display:grid;grid-template-columns:6fr 4fr;gap:10px;}
+
+/* STAT CARDS */
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;border-left:4px solid var(--primary);}
+.stat-card.orange{border-left-color:var(--accent);}
+.stat-card.green{border-left-color:var(--risk-low);}
+.stat-card.red{border-left-color:var(--risk-high);}
+.stat-label{font-size:10.5px;color:var(--text-muted);margin-bottom:5px;}
+.stat-value{font-size:26px;font-weight:900;color:var(--text);line-height:1;}
+.stat-sub{font-size:10px;color:var(--text-muted);margin-top:4px;}
+
+/* RISK */
+.risk{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;}
+.risk-고위험{background:#FDECEA;color:var(--risk-high);}
+.risk-중위험{background:#FFF8E1;color:var(--risk-mid);}
+.risk-저위험{background:#E6FAF5;color:var(--risk-low);}
+.risk-초고위험{background:#F5E0E0;color:var(--risk-critical);}
+.risk-1{background:#E6FAF5;color:var(--risk-low);}
+.risk-2{background:#FFF8E1;color:var(--risk-mid);}
+.risk-3{background:#FDECEA;color:var(--risk-high);}
+.risk-4{background:#F5E0E0;color:var(--risk-critical);}
+
+/* TABLE */
+.table-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:11.5px;}
+thead th{background:var(--surface2);padding:8px 11px;text-align:left;font-weight:700;font-size:10.5px;color:var(--text-muted);border-bottom:1px solid var(--border);}
+tbody td{padding:8px 11px;border-bottom:1px solid var(--border);vertical-align:middle;}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover{background:var(--bg);}
+
+/* STEP FLOW */
+.step-flow{display:flex;align-items:flex-start;gap:0;overflow-x:auto;padding:2px 0 6px;}
+.step-item{flex:1;min-width:90px;text-align:center;position:relative;}
+.step-item::after{content:'›';position:absolute;right:-6px;top:10px;font-size:18px;color:var(--border);line-height:1;}
+.step-item:last-child::after{display:none;}
+.step-circle{width:34px;height:34px;border-radius:50%;background:var(--surface2);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;margin:0 auto 5px;font-size:13px;}
+.step-circle.done{background:var(--risk-low);border-color:var(--risk-low);color:#fff;}
+.step-circle.active{background:var(--primary);border-color:var(--primary);color:#fff;}
+.step-circle.warn{background:var(--risk-mid);border-color:var(--risk-mid);color:#fff;}
+.step-label{font-size:9.5px;color:var(--text);font-weight:600;}
+.step-sub{font-size:8.5px;color:var(--text-muted);margin-top:2px;}
+
+/* AI CHAT */
+.ai-panel{background:linear-gradient(135deg,#0A3D91 0%,#1155CC 100%);border-radius:10px;padding:16px 18px;color:#fff;}
+.ai-panel-title{font-size:13px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:7px;}
+.ai-badge{background:var(--accent);color:#fff;font-size:9px;padding:2px 6px;border-radius:4px;font-weight:700;}
+.ai-messages{display:flex;flex-direction:column;gap:7px;margin-bottom:10px;max-height:220px;overflow-y:auto;}
+.ai-msg{font-size:11.5px;line-height:1.65;padding:8px 11px;border-radius:7px;}
+.ai-msg.assistant{background:rgba(255,255,255,0.12);}
+.ai-msg.user{background:rgba(255,255,255,0.07);text-align:right;}
+.ai-msg .msg-label{font-size:9.5px;font-weight:700;margin-bottom:3px;color:rgba(255,255,255,0.55);}
+.ai-input-row{display:flex;gap:7px;}
+.ai-input{flex:1;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:6px;padding:7px 11px;font-size:11.5px;color:#fff;font-family:'Noto Sans KR',sans-serif;outline:none;}
+.ai-input::placeholder{color:rgba(255,255,255,0.38);}
+.ai-send{background:var(--accent);border:none;border-radius:6px;padding:7px 13px;color:#fff;font-size:14px;cursor:pointer;font-weight:700;}
+
+/* CHECKLIST */
+.checklist{display:flex;flex-direction:column;gap:5px;}
+.check-item{display:flex;align-items:flex-start;gap:9px;padding:7px 10px;border-radius:6px;background:var(--surface2);font-size:11.5px;}
+.check-item.done{background:#E6FAF5;}
+.check-item.warn{background:#FFF8E1;}
+.check-item.fail{background:#FDECEA;}
+.check-item.na{background:#F5F5F5;}
+.check-box{width:16px;height:16px;border-radius:4px;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;}
+.check-box.done{background:var(--risk-low);color:#fff;}
+.check-box.warn{background:var(--risk-mid);color:#fff;}
+.check-box.fail{background:var(--risk-high);color:#fff;}
+.check-box.na{background:#ccc;color:#fff;}
+.check-box.pending{background:var(--border);}
+.check-text strong{display:block;font-weight:600;margin-bottom:2px;}
+.check-text span{color:var(--text-muted);font-size:10.5px;}
+
+/* BTN */
+.btn{font-size:11.5px;font-weight:600;padding:7px 13px;border-radius:6px;border:none;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+.btn-primary{background:var(--primary);color:#fff;}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text);}
+.btn-accent{background:var(--accent);color:#fff;}
+.btn-sm{padding:4px 9px;font-size:10.5px;}
+
+/* PROGRESS */
+.progress-bar{height:5px;border-radius:3px;background:var(--surface2);overflow:hidden;margin-top:5px;}
+.progress-fill{height:100%;border-radius:3px;}
+
+/* TIMELINE */
+.timeline{display:flex;flex-direction:column;gap:0;}
+.tl-item{display:flex;gap:11px;padding-bottom:13px;position:relative;}
+.tl-item::before{content:'';position:absolute;left:14px;top:27px;bottom:0;width:1px;background:var(--border);}
+.tl-item:last-child::before{display:none;}
+.tl-dot{width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;z-index:1;}
+.tl-content{flex:1;}
+.tl-title{font-size:11.5px;font-weight:700;margin-bottom:2px;}
+.tl-desc{font-size:10.5px;color:var(--text-muted);}
+.tl-date{font-size:9.5px;color:var(--text-muted);font-family:'IBM Plex Mono',monospace;margin-bottom:2px;}
+
+/* TABS */
+.tabs{display:flex;border-bottom:2px solid var(--border);margin-bottom:14px;}
+.tab{padding:7px 14px;font-size:12px;font-weight:600;color:var(--text-muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;}
+.tab.active{color:var(--primary);border-bottom-color:var(--primary);}
+
+/* ALERT */
+.alert{display:flex;align-items:flex-start;gap:9px;padding:9px 13px;border-radius:7px;font-size:11.5px;}
+.alert-info{background:#E8F0FE;color:var(--primary);border-left:3px solid var(--primary);}
+.alert-warn{background:#FFF8E1;color:#856404;border-left:3px solid var(--risk-mid);}
+.alert-success{background:#E6FAF5;color:#065f46;border-left:3px solid var(--risk-low);}
+.alert-red{background:#FDECEA;color:#7B1919;border-left:3px solid var(--risk-high);}
+
+/* GAUGE */
+.gauge-row{display:flex;flex-direction:column;gap:7px;}
+.gauge-item{display:flex;flex-direction:column;gap:3px;}
+.gauge-label-row{display:flex;justify-content:space-between;font-size:10.5px;}
+.gauge-label{color:var(--text);font-weight:500;}
+.gauge-val{color:var(--text-muted);font-family:'IBM Plex Mono',monospace;}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+
+.mono{font-family:'IBM Plex Mono',monospace;}
+.chip{display:inline-block;font-size:10px;padding:1px 7px;border-radius:20px;border:1px solid var(--border);color:var(--text-muted);background:var(--surface2);}
+
+/* RISK TABLE MATRIX */
+.risk-matrix{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
+.risk-box{border-radius:8px;padding:10px 12px;font-size:11px;}
+.risk-box strong{display:block;font-size:13px;font-weight:900;margin-bottom:3px;}
+
+/* ORG CHART */
+.org-row{display:flex;gap:8px;justify-content:center;margin-bottom:6px;}
+.org-box{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:7px 12px;font-size:11px;font-weight:600;text-align:center;min-width:90px;}
+.org-box.highlight{background:#E8F0FE;border-color:var(--primary);color:var(--primary);}
+.org-box.accent{background:#FFF3E0;border-color:var(--accent);color:#E65100;}
+
+/* 9 RISKS */
+.risk9-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.risk9-item{background:var(--surface2);border-radius:8px;padding:10px;border-left:3px solid var(--border);}
+.risk9-item:nth-child(1){border-left-color:#4285F4;}
+.risk9-item:nth-child(2){border-left-color:#E8453C;}
+.risk9-item:nth-child(3){border-left-color:#F5A623;}
+.risk9-item:nth-child(4){border-left-color:#00C9A7;}
+.risk9-item:nth-child(5){border-left-color:#9C27B0;}
+.risk9-item:nth-child(6){border-left-color:#FF6B00;}
+.risk9-item:nth-child(7){border-left-color:#2196F3;}
+.risk9-item:nth-child(8){border-left-color:#795548;}
+.risk9-item:nth-child(9){border-left-color:#607D8B;}
+.risk9-name{font-size:12px;font-weight:700;margin-bottom:3px;}
+.risk9-desc{font-size:10.5px;color:var(--text-muted);line-height:1.5;}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="brand">iM AI GOVERNANCE</div>
+    <div class="sub">AI 기본법 준거 · SDS·김앤장 컨소시엄 기반<br>AI 위험관리 플랫폼 v2.0</div>
+  </div>
+
+  <div class="sidebar-section-label">주요 메뉴</div>
+  <div class="nav-item active" onclick="showPage('dashboard')"><span class="icon">📊</span> 거버넌스 대시보드</div>
+  <div class="nav-item" onclick="showPage('ai-check')"><span class="icon">🔎</span> AI 서비스 여부 판단</div>
+  <div class="nav-item" onclick="showPage('risk-grade')"><span class="icon">🎯</span> AI 위험등급 분류</div>
+  <div class="nav-item" onclick="showPage('checklist')"><span class="icon">✅</span> 위험평가 체크리스트</div>
+  <div class="nav-item" onclick="showPage('process')"><span class="icon">🔄</span> 위험관리 프로세스</div>
+
+  <div class="sidebar-section-label">거버넌스 관리</div>
+  <div class="nav-item" onclick="showPage('org')"><span class="icon">🏛️</span> 조직 · 역할</div>
+  <div class="nav-item" onclick="showPage('monitor')"><span class="icon">📡</span> 실시간 모니터링</div>
+  <div class="nav-item" onclick="showPage('audit')"><span class="icon">🗂️</span> 감사 이력</div>
+
+  <div class="sidebar-section-label">AI 어시스턴트</div>
+  <div class="nav-item" onclick="showPage('ai-assistant')"><span class="icon">🤖</span> AI 거버넌스 보조</div>
+
+  <div class="sidebar-footer">
+    iM금융지주 AI거버넌스 v2.0<br>
+    SDS · 김앤장 컨소시엄 산출물 기반<br>
+    AI 기본법 · 금융분야 AI 안내서 준거
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div>
+      <div class="topbar-title" id="page-title">거버넌스 대시보드</div>
+      <div class="topbar-breadcrumb" id="page-breadcrumb">홈 / 대시보드</div>
+    </div>
+    <span class="badge badge-law">AI 기본법 준거</span>
+    <span class="badge badge-ai">AI-Powered System</span>
+    <div class="topbar-spacer"></div>
+    <div class="topbar-user">
+      <div class="avatar">김</div>
+      <span>김담당 | AI 거버넌스 주관부서</span>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ══════════ PAGE: DASHBOARD ══════════ -->
+    <div class="page active" id="page-dashboard">
+      <div class="grid-4">
+        <div class="stat-card">
+          <div class="stat-label">등록 AI 서비스</div>
+          <div class="stat-value">24</div>
+          <div class="stat-sub">고위험 7 · 중위험 11 · 저위험 6</div>
+        </div>
+        <div class="stat-card orange">
+          <div class="stat-label">이번 달 위험평가</div>
+          <div class="stat-value">9</div>
+          <div class="stat-sub">기획 4 · 개발 3 · 운영 2</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-label">AI 기본법 준수율</div>
+          <div class="stat-value">94%</div>
+          <div class="stat-sub">고위험 AI 의무 이행 기준</div>
+        </div>
+        <div class="stat-card red">
+          <div class="stat-label">보완 필요 항목</div>
+          <div class="stat-value">3</div>
+          <div class="stat-sub">즉시 조치 필요</div>
+        </div>
+      </div>
+
+      <div class="grid-70-30">
+        <div class="card">
+          <div class="card-title">
+            AI 서비스 위험평가 현황
+            <span class="law-ref">AI 기본법 제34조</span>
+            <span class="law-ref">금융분야 AI 안내서</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>서비스명</th>
+                  <th>사업자 유형</th>
+                  <th>AI 유형</th>
+                  <th>위험등급</th>
+                  <th>생애주기</th>
+                  <th>보완 항목</th>
+                  <th>상태</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>iM 신용평가 AI</strong><br><span style="font-size:9.5px;color:var(--text-muted)">대출심사 자동화 — 고영향AI</span></td>
+                  <td><span class="chip">이용사업자</span></td>
+                  <td><span class="chip">비생성형</span></td>
+                  <td><span class="risk risk-3">고위험</span></td>
+                  <td><span class="chip">기획</span></td>
+                  <td><span style="color:var(--risk-mid);font-weight:700">2건</span></td>
+                  <td><span style="color:var(--risk-mid);font-size:10.5px;font-weight:600">● 검토중</span></td>
+                </tr>
+                <tr>
+                  <td><strong>iM 챗봇 AI</strong><br><span style="font-size:9.5px;color:var(--text-muted)">고객 상담 자동응답</span></td>
+                  <td><span class="chip">이용사업자</span></td>
+                  <td><span class="chip">생성형</span></td>
+                  <td><span class="risk risk-2">중위험</span></td>
+                  <td><span class="chip">운영</span></td>
+                  <td><span style="color:var(--risk-low);font-weight:700">0건</span></td>
+                  <td><span style="color:var(--risk-low);font-size:10.5px;font-weight:600">✔ 승인</span></td>
+                </tr>
+                <tr>
+                  <td><strong>마케팅 개인화 AI</strong><br><span style="font-size:9.5px;color:var(--text-muted)">맞춤형 상품 추천</span></td>
+                  <td><span class="chip">이용사업자</span></td>
+                  <td><span class="chip">비생성형</span></td>
+                  <td><span class="risk risk-2">중위험</span></td>
+                  <td><span class="chip">운영</span></td>
+                  <td><span style="color:var(--risk-mid);font-weight:700">1건</span></td>
+                  <td><span style="color:var(--risk-mid);font-size:10.5px;font-weight:600">● 검토중</span></td>
+                </tr>
+                <tr>
+                  <td><strong>채용 스크리닝 AI</strong><br><span style="font-size:9.5px;color:var(--text-muted)">서류심사 자동화 — 고영향AI</span></td>
+                  <td><span class="chip">개발사업자</span></td>
+                  <td><span class="chip">비생성형</span></td>
+                  <td><span class="risk risk-3">고위험</span></td>
+                  <td><span class="chip">개발</span></td>
+                  <td><span style="color:var(--risk-high);font-weight:700">3건</span></td>
+                  <td><span style="color:var(--risk-high);font-size:10.5px;font-weight:600">⚠ 보완필요</span></td>
+                </tr>
+                <tr>
+                  <td><strong>내부문서 요약 AI</strong><br><span style="font-size:9.5px;color:var(--text-muted)">임직원 업무 지원</span></td>
+                  <td><span class="chip">이용사업자</span></td>
+                  <td><span class="chip">생성형</span></td>
+                  <td><span class="risk risk-1">저위험</span></td>
+                  <td><span class="chip">운영</span></td>
+                  <td><span style="color:var(--risk-low);font-weight:700">0건</span></td>
+                  <td><span style="color:var(--risk-low);font-size:10.5px;font-weight:600">✔ 승인</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="card">
+            <div class="card-title">단계별 진행률</div>
+            <div class="gauge-row">
+              <div class="gauge-item">
+                <div class="gauge-label-row"><span class="gauge-label">① 기획 단계</span><span class="gauge-val">72%</span></div>
+                <div class="progress-bar"><div class="progress-fill" style="width:72%;background:var(--primary)"></div></div>
+              </div>
+              <div class="gauge-item">
+                <div class="gauge-label-row"><span class="gauge-label">② 개발 단계</span><span class="gauge-val">58%</span></div>
+                <div class="progress-bar"><div class="progress-fill" style="width:58%;background:var(--accent)"></div></div>
+              </div>
+              <div class="gauge-item">
+                <div class="gauge-label-row"><span class="gauge-label">③ 평가·검증</span><span class="gauge-val">85%</span></div>
+                <div class="progress-bar"><div class="progress-fill" style="width:85%;background:#9C27B0"></div></div>
+              </div>
+              <div class="gauge-item">
+                <div class="gauge-label-row"><span class="gauge-label">④ 운영 단계</span><span class="gauge-val">91%</span></div>
+                <div class="progress-bar"><div class="progress-fill" style="width:91%;background:var(--risk-low)"></div></div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">⚡ AI 자동 알림</div>
+            <div style="display:flex;flex-direction:column;gap:5px;">
+              <div class="alert alert-red" style="font-size:10.5px;"><span>⚠</span><span>채용 AI — 사전 고지 표시 미비 (AI기본법 제31조)</span></div>
+              <div class="alert alert-warn" style="font-size:10.5px;"><span>!</span><span>신용평가 AI — 통제가능성(HITL) 절차 보완 권고</span></div>
+              <div class="alert alert-info" style="font-size:10.5px;"><span>ℹ</span><span>마케팅 AI — 공정성 모니터링 재수행 필요</span></div>
+              <div class="alert alert-success" style="font-size:10.5px;"><span>✔</span><span>챗봇 AI — 운영 단계 전 항목 이상 없음</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 생애주기 프로세스 흐름 -->
+      <div class="card">
+        <div class="card-title">AI 생애주기별 위험관리 프로세스 <span class="law-ref">AI 거버넌스 매뉴얼 III장</span></div>
+        <div class="step-flow">
+          <div class="step-item">
+            <div class="step-circle done">✓</div>
+            <div class="step-label">사업계획 수립</div>
+            <div class="step-sub">소관부서(기획)</div>
+          </div>
+          <div class="step-item">
+            <div class="step-circle done">✓</div>
+            <div class="step-label">위험등급 분류</div>
+            <div class="step-sub">AI기본법 기준</div>
+          </div>
+          <div class="step-item">
+            <div class="step-circle active">◎</div>
+            <div class="step-label">위험평가(기획)</div>
+            <div class="step-sub">체크리스트 검토</div>
+          </div>
+          <div class="step-item">
+            <div class="step-circle warn">!</div>
+            <div class="step-label">위험완화 계획</div>
+            <div class="step-sub">보완 조치 수립</div>
+          </div>
+          <div class="step-item">
+            <div class="step-circle" style="color:var(--text-muted)">5</div>
+            <div class="step-label">개발 · 학습</div>
+            <div class="step-sub">소관부서(개발)</div>
+          </div>
+          <div class="step-item">
+            <div class="step-circle" style="color:var(--text-muted)">6</div>
+            <div class="step-label">위험평가(개발)</div>
+            <div class="step-sub">9대 위험 점검</div>
+          </div>
+          <div class="step-item">
+            <div class="step-circle" style="color:var(--text-muted)">7</div>
+            <div class="step-label">평가·검증</div>
+            <div class="step-sub">개발자 검증</div>
+          </div>
+          <div class="step-item">
+            <div class="step-circle" style="color:var(--text-muted)">8</div>
+            <div class="step-label">제3자 검증</div>
+            <div class="step-sub">고위험 시 필수</div>
+          </div>
+          <div class="step-item">
+            <div class="step-circle" style="color:var(--text-muted)">9</div>
+            <div class="step-label">운영 통지</div>
+            <div class="step-sub">거버넌스 주관</div>
+          </div>
+          <div class="step-item">
+            <div class="step-circle" style="color:var(--text-muted)">10</div>
+            <div class="step-label">운영·모니터링</div>
+            <div class="step-sub">상시 위험평가</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ PAGE: AI-CHECK ══════════ -->
+    <div class="page" id="page-ai-check">
+      <div class="alert alert-info">
+        <span>🤖</span>
+        <span>AI 기본법상 <strong>AI 서비스 여부</strong>는 <strong>4개 필수 요건</strong>을 모두 충족해야 합니다. 아래 항목에 답변하면 AI가 자동으로 판단합니다.</span>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">AI 서비스 여부 판단 <span class="law-ref">AI기본법 제2조</span></div>
+          <div style="margin-bottom:12px;font-size:11.5px;color:var(--text-muted);">※ 4개 요건 모두 Y인 경우에만 'AI 서비스'에 해당합니다.</div>
+          <div class="checklist">
+            <div class="check-item done">
+              <div class="check-box done">Y</div>
+              <div class="check-text">
+                <strong>① 자율성</strong>
+                <span>시스템이 사람의 직접 개입 없이 독립적으로 데이터를 학습하고 외부 환경을 판단하며 운용될 수 있는가?</span>
+              </div>
+            </div>
+            <div class="check-item done">
+              <div class="check-box done">Y</div>
+              <div class="check-text">
+                <strong>② 적응성</strong>
+                <span>초기 개발 후에도 배포 전후 입력 데이터와 상호작용하여 스스로 행동 방식을 수정할 수 있는가? (기계학습 기반)</span>
+              </div>
+            </div>
+            <div class="check-item done">
+              <div class="check-box done">Y</div>
+              <div class="check-text">
+                <strong>③ 결과물 (추론 기반)</strong>
+                <span>추론에 기반하여 산출된 결과물이 <strong>예측·추천·결정·생성</strong> 중 하나에 해당하는가?</span>
+              </div>
+            </div>
+            <div class="check-item done">
+              <div class="check-box done">Y</div>
+              <div class="check-text">
+                <strong>④ 활용성</strong>
+                <span>고객채널, 금융상품·서비스, 내부통제, 리스크관리, 소비자보호, 채용·인사평가에 활용되는가?</span>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:12px;padding:10px;background:var(--surface2);border-radius:7px;text-align:center;">
+            <div style="font-size:18px;font-weight:900;color:var(--risk-low)">✔ AI 서비스에 해당</div>
+            <div style="font-size:10.5px;color:var(--text-muted);margin-top:3px;">4개 요건 모두 충족 — 위험등급 분류 진행</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">판단 요건별 예시 가이드</div>
+          <div style="display:flex;flex-direction:column;gap:7px;font-size:11.5px;">
+            <div style="padding:8px 10px;background:#E8F0FE;border-radius:6px;">
+              <div style="font-weight:700;color:var(--primary);margin-bottom:3px;">① 자율성 — 해당 예시</div>
+              <div style="color:var(--text-muted);">프로세스 자동화 후 입력값에 따라 스스로 추천/출력 생성하는 시스템<br><span style="color:#888">✗ 비해당: 단순 통계모형, 100% 규칙기반(Rule-based)</span></div>
+            </div>
+            <div style="padding:8px 10px;background:#E8F0FE;border-radius:6px;">
+              <div style="font-weight:700;color:var(--primary);margin-bottom:3px;">③ 결과물 — 유형 구분</div>
+              <div style="color:var(--text-muted);">예측: 미래 고객행동 예측 | 추천: 개인화 상품 추천<br>결정: 인간 개입 없이 자동 판단 | 생성: 텍스트·이미지 생성</div>
+            </div>
+            <div style="padding:8px 10px;background:#FFF8E1;border-radius:6px;">
+              <div style="font-weight:700;color:#856404;margin-bottom:3px;">④ 활용성 — 비해당 예시</div>
+              <div style="color:var(--text-muted);">개인 PC에서만 운영되는 AI | PoC(기술검증) 중인 시스템 | 단순 개인 업무효율화 툴</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ PAGE: RISK-GRADE ══════════ -->
+    <div class="page" id="page-risk-grade">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">AI 위험등급 분류 <span class="law-ref">AI기본법 적용범위 검토서</span></div>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;">
+            <div>
+              <div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:4px;">[1] 사업자 유형 판단</div>
+              <div style="display:flex;gap:7px;">
+                <div style="flex:1;padding:8px;background:var(--surface2);border-radius:6px;font-size:11px;">
+                  <div style="font-weight:700;margin-bottom:2px;">인공지능개발사업자</div>
+                  <div style="color:var(--text-muted);">AI를 직접/제3자 통해 개발하여 제공 또는 성능에 중대한 영향을 줄 정도로 수정·변경</div>
+                </div>
+                <div style="flex:1;padding:8px;background:var(--surface2);border-radius:6px;font-size:11px;">
+                  <div style="font-weight:700;margin-bottom:2px;">인공지능이용사업자</div>
+                  <div style="color:var(--text-muted);">개발사업자가 제공한 AI를 이용하여 AI제품 또는 AI서비스를 제공</div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:4px;">[2] 생성형 AI 여부 (AI기본법 제31조 투명성 의무)</div>
+              <div class="checklist">
+                <div class="check-item done"><div class="check-box done">✓</div><div class="check-text"><strong>기존 데이터 학습으로 글·소리·그림·영상 생성·변형</strong><span>또는 매번 다른 결과물 생성 — 생성형 AI 해당</span></div></div>
+              </div>
+            </div>
+            <div>
+              <div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:4px;">[3] 고영향 AI 여부 (고위험 — 가장 강화된 관리)</div>
+              <div class="checklist">
+                <div class="check-item warn"><div class="check-box warn">!</div><div class="check-text"><strong>채용 분야</strong><span>AI가 구직자 프로파일링·점수화·채용 결정에 관여하는 경우</span></div></div>
+                <div class="check-item warn"><div class="check-box warn">!</div><div class="check-text"><strong>대출심사 분야</strong><span>개인 신용평가·여신가부·금융계약 체결 여부에 AI 산출물이 중요 근거로 활용</span></div></div>
+              </div>
+            </div>
+            <div>
+              <div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:4px;">[4] 소비자 권익·평판 영향 (중위험)</div>
+              <div class="checklist">
+                <div class="check-item"><div class="check-box pending"></div><div class="check-text"><strong>금융계약 체결·유지 또는 금융거래조건 결정 보조</strong><span>소비자에게 재산상 손해를 끼칠 수 있는 경우</span></div></div>
+                <div class="check-item"><div class="check-box pending"></div><div class="check-text"><strong>금융거래 중단·부적합 추천·불이익 조건 제공 가능성</strong><span>이상거래탐지, 금융상품 추천 등</span></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="card">
+            <div class="card-title">등급별 관리 항목</div>
+            <div class="risk-matrix" style="grid-template-columns:repeat(3,1fr);">
+              <div class="risk-box" style="background:#FDECEA;border:1px solid #FBBCBC;">
+                <strong style="color:var(--risk-high)">고위험</strong>
+                <div style="font-size:10px;color:#7B1919;">고영향 AI<br>· 기본점검<br>· AI 9대 위험 全<br>· AI기본법 의무<br>· 생성형 의무</div>
+              </div>
+              <div class="risk-box" style="background:#FFF8E1;border:1px solid #FFE082;">
+                <strong style="color:var(--risk-mid)">중위험</strong>
+                <div style="font-size:10px;color:#856404;">· 기본점검<br>· AI 9대 위험 일부<br>· 생성형 의무<br>(고영향 의무 제외)</div>
+              </div>
+              <div class="risk-box" style="background:#E6FAF5;border:1px solid #A5D6A7;">
+                <strong style="color:var(--risk-low)">저위험</strong>
+                <div style="font-size:10px;color:#065f46;">· 기본점검<br>· AI 9대 위험 일부<br>· 생성형 의무<br>(간소화 관리)</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">AI 9대 위험 유형 <span class="law-ref">거버넌스 매뉴얼 II장</span></div>
+            <div class="risk9-grid">
+              <div class="risk9-item"><div class="risk9-name">① 성능</div><div class="risk9-desc">의도된 성능기준 미충족 위험</div></div>
+              <div class="risk9-item"><div class="risk9-name">② 공정성</div><div class="risk9-desc">차별적 결과물 도출 위험</div></div>
+              <div class="risk9-item"><div class="risk9-name">③ 유해성</div><div class="risk9-desc">불법·사회윤리 위반 위험</div></div>
+              <div class="risk9-item"><div class="risk9-name">④ 설명가능성</div><div class="risk9-desc">결과 설명 불가 위험 (XAI)</div></div>
+              <div class="risk9-item"><div class="risk9-name">⑤ 데이터보호</div><div class="risk9-desc">개인/기밀정보 오용·유출</div></div>
+              <div class="risk9-item"><div class="risk9-name">⑥ 제3자 위험</div><div class="risk9-desc">위수탁·제3자 서비스 위험</div></div>
+              <div class="risk9-item"><div class="risk9-name">⑦ 사이버보안</div><div class="risk9-desc">적대적 공격·외부 위협</div></div>
+              <div class="risk9-item"><div class="risk9-name">⑧ 통제가능성</div><div class="risk9-desc">인간 감독·통제 불가 위험</div></div>
+              <div class="risk9-item"><div class="risk9-name">⑨ 지식재산권</div><div class="risk9-desc">IP 침해 위험</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ PAGE: CHECKLIST ══════════ -->
+    <div class="page" id="page-checklist">
+      <div class="alert alert-info">
+        <span>🤖</span>
+        <span>AI가 서비스 등급·유형에 따라 <strong>기획·개발·운영 단계별 체크리스트를 자동 생성</strong>합니다. 소관부서는 평가 결과만 입력, AI 거버넌스 주관부서가 검토 결과를 작성합니다.</span>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          심사 대상: iM 신용평가 AI (고위험 · 비생성형 · 기획단계)
+          <span class="law-ref">위험평가 체크리스트 v1.1</span>
+        </div>
+
+        <div class="tabs">
+          <div class="tab active" onclick="switchTab(this,'tab-planning')">① 기획 단계</div>
+          <div class="tab" onclick="switchTab(this,'tab-dev')">② 개발 단계</div>
+          <div class="tab" onclick="switchTab(this,'tab-ops')">③ 운영 단계</div>
+        </div>
+
+        <!-- 기획단계 -->
+        <div id="tab-planning">
+          <div style="font-size:10.5px;color:var(--text-muted);margin-bottom:10px;">🤖 AI 기본법 및 금융분야 AI 안내서 기반 — 고위험 AI 적용 항목 자동 생성</div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width:5%">구분</th>
+                  <th style="width:15%">대/중구분</th>
+                  <th style="width:30%">평가 문항</th>
+                  <th style="width:8%">소관부서<br>평가결과</th>
+                  <th style="width:10%">AI 1차 검토</th>
+                  <th style="width:20%">AI 검토의견</th>
+                  <th style="width:12%">관련 법령</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="mono" style="font-weight:700">1.1.1</td>
+                  <td><strong>기본점검</strong><br><span style="font-size:9.5px;color:var(--text-muted)">윤리원칙 점검</span></td>
+                  <td style="font-size:10.5px;">AI 서비스 활용 목적이 AI 윤리원칙에 부합하는가?</td>
+                  <td><span style="color:var(--risk-low);font-weight:700">Y</span></td>
+                  <td><span style="color:var(--risk-low);font-size:10.5px;">✔ 이상없음</span></td>
+                  <td style="font-size:10px;color:var(--text-muted);">공정성·데이터보호 계획 수립 확인</td>
+                  <td style="font-size:9.5px;color:var(--primary)">금융분야 AI 안내서</td>
+                </tr>
+                <tr>
+                  <td class="mono" style="font-weight:700">2.1.1</td>
+                  <td><strong>고위험 AI</strong><br><span style="font-size:9.5px;color:var(--text-muted)">위험관리방안</span></td>
+                  <td style="font-size:10.5px;">AI 기본법상 요구 위험관리방안(정책·교육·조직체계 등)을 수립하였는가?</td>
+                  <td><span style="color:var(--risk-low);font-weight:700">Y</span></td>
+                  <td><span style="color:var(--risk-low);font-size:10.5px;">✔ 이상없음</span></td>
+                  <td style="font-size:10px;color:var(--text-muted);">AI 거버넌스 매뉴얼 III장 수립 확인</td>
+                  <td style="font-size:9.5px;color:var(--primary)">AI기본법 제34조①1호</td>
+                </tr>
+                <tr>
+                  <td class="mono" style="font-weight:700">2.4.1</td>
+                  <td><strong>고위험 AI</strong><br><span style="font-size:9.5px;color:var(--text-muted)">설명 제공</span></td>
+                  <td style="font-size:10.5px;">결과·결과 산출기준·학습데이터 개요 등 설명 방안을 수립하였는가? (XAI 적용 검토)</td>
+                  <td><span style="color:var(--risk-low);font-weight:700">Y</span></td>
+                  <td><span style="color:var(--risk-low);font-size:10.5px;">✔ 이상없음</span></td>
+                  <td style="font-size:10px;color:var(--text-muted);">AI 위험완화 계획서 내 SHAP/LIME 적용 명시</td>
+                  <td style="font-size:9.5px;color:var(--primary)">시행령 초안 제24조</td>
+                </tr>
+                <tr style="background:#FFF8E1;">
+                  <td class="mono" style="font-weight:700">2.5.1</td>
+                  <td><strong>고위험 AI</strong><br><span style="font-size:9.5px;color:var(--text-muted)">사전고지·표시</span></td>
+                  <td style="font-size:10.5px;">AI 기반 운용 사실을 이용자에게 사전 고지하는 방안을 마련하였는가?</td>
+                  <td><span style="color:var(--risk-low);font-weight:700">Y</span></td>
+                  <td><span style="color:var(--risk-mid);font-size:10.5px;">⚠ 보완필요</span></td>
+                  <td style="font-size:10px;color:#856404;"><strong>더 구체적인 안내 문구 보완 필요</strong> — 현재 "AI 추정치" 표시는 내용이 불충분</td>
+                  <td style="font-size:9.5px;color:var(--primary)">AI기본법 제31조①</td>
+                </tr>
+                <tr>
+                  <td class="mono" style="font-weight:700">4.1.1</td>
+                  <td><strong>AI 9대 위험</strong><br><span style="font-size:9.5px;color:var(--text-muted)">공정성</span></td>
+                  <td style="font-size:10.5px;">법령상 차별금지 규제(금융소비자보호법 제15조) 적용 여부 확인 및 공정성 지표 선정 여부</td>
+                  <td><span style="color:var(--risk-low);font-weight:700">Y</span></td>
+                  <td><span style="color:var(--risk-low);font-size:10.5px;">✔ 이상없음</span></td>
+                  <td style="font-size:10px;color:var(--text-muted);">Bias Score·Toxicity Score 지표 선정 확인</td>
+                  <td style="font-size:9.5px;color:var(--primary)">금융분야 AI 안내서</td>
+                </tr>
+                <tr>
+                  <td class="mono" style="font-weight:700">4.4.1</td>
+                  <td><strong>AI 9대 위험</strong><br><span style="font-size:9.5px;color:var(--text-muted)">통제가능성</span></td>
+                  <td style="font-size:10.5px;">AI 결과에 따라 의사결정 시 임직원 개입 기준 및 절차(HITL)를 정의하였는가?</td>
+                  <td><span style="color:var(--risk-low);font-weight:700">Y</span></td>
+                  <td><span style="color:var(--risk-low);font-size:10.5px;">✔ 이상없음</span></td>
+                  <td style="font-size:10px;color:var(--text-muted);">AI 위험완화 계획서 내 재산출 절차 명시 확인</td>
+                  <td style="font-size:9.5px;color:var(--primary)">금융분야 AI 안내서</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:12px;align-items:center;">
+            <div style="flex:1;font-size:11.5px;"><strong>🤖 AI 종합 의견:</strong> <span style="color:var(--risk-mid)">보완 후 승인 권고</span> — 2.5.1 사전 고지 문구 구체화 후 재검토 요청</div>
+            <div style="font-size:10px;color:var(--text-muted)">보완 필요: 1건</div>
+            <button class="btn btn-outline btn-sm">📄 의견서 자동 생성</button>
+            <button class="btn btn-outline btn-sm">보완 요청</button>
+            <button class="btn btn-primary btn-sm">최종 승인</button>
+          </div>
+        </div>
+
+        <!-- 개발단계 -->
+        <div id="tab-dev" style="display:none;">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>구분</th>
+                  <th>대/중구분</th>
+                  <th>평가 문항</th>
+                  <th>결과</th>
+                  <th>AI 검토</th>
+                  <th>주요 평가 기준</th>
+                  <th>관련 법령</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="mono">4.1.1</td>
+                  <td><strong>AI 9대 위험</strong><br><span style="font-size:9.5px;color:var(--text-muted)">성능</span></td>
+                  <td style="font-size:10.5px;">AI 모형 성능 평가 지표(Precision·Accuracy·F1·AUROC 등) 선정 및 평가검증 수행</td>
+                  <td><span style="color:var(--risk-low)">Y</span></td>
+                  <td><span style="color:var(--risk-low);font-size:10.5px;">✔</span></td>
+                  <td style="font-size:10px;color:var(--text-muted);">[비생성형] Precision, F1-score, AUROC 등 자체 기준</td>
+                  <td style="font-size:9.5px;color:var(--primary)">금융분야 AI 안내서</td>
+                </tr>
+                <tr>
+                  <td class="mono">4.2.1</td>
+                  <td><strong>AI 9대 위험</strong><br><span style="font-size:9.5px;color:var(--text-muted)">공정성</span></td>
+                  <td style="font-size:10.5px;">편향성 지표(PSI 0.25↑, Fairness Tree) 선정 후 개발 단계별 편향 테스트 수행</td>
+                  <td><span style="color:var(--risk-low)">Y</span></td>
+                  <td><span style="color:var(--risk-low);font-size:10.5px;">✔</span></td>
+                  <td style="font-size:10px;color:var(--text-muted);">[비생성형] PSI ≥ 0.25, 4/5 Rule 기반 Fairness Tree</td>
+                  <td style="font-size:9.5px;color:var(--primary)">금융분야 AI 안내서</td>
+                </tr>
+                <tr>
+                  <td class="mono">4.4.1</td>
+                  <td><strong>AI 9대 위험</strong><br><span style="font-size:9.5px;color:var(--text-muted)">설명가능성</span></td>
+                  <td style="font-size:10.5px;">SHAP/LIME 등 XAI 기술 적용 또는 대안 검토 (AI출력이 참고자료만인 경우 N/A)</td>
+                  <td><span style="color:var(--text-muted)">N/A</span></td>
+                  <td><span style="color:var(--text-muted);font-size:10.5px;">— N/A</span></td>
+                  <td style="font-size:10px;color:var(--text-muted);">AI 출력 결과가 참고자료로만 활용</td>
+                  <td style="font-size:9.5px;color:var(--primary)">금융분야 AI 안내서</td>
+                </tr>
+                <tr>
+                  <td class="mono">4.5.1</td>
+                  <td><strong>AI 9대 위험</strong><br><span style="font-size:9.5px;color:var(--text-muted)">데이터보호</span></td>
+                  <td style="font-size:10.5px;">신뢰할 수 있는 출처의 데이터셋 사용 여부 및 학습데이터 메타정보(출처·버전·수정이력) 기록</td>
+                  <td><span style="color:var(--risk-low)">Y</span></td>
+                  <td><span style="color:var(--risk-low);font-size:10.5px;">✔</span></td>
+                  <td style="font-size:10px;color:var(--text-muted);">위수탁 업체 증빙자료 및 AI 서비스 개발 계획서 확인</td>
+                  <td style="font-size:9.5px;color:var(--primary)">TTA 개발안내서</td>
+                </tr>
+                <tr>
+                  <td class="mono">4.8.1</td>
+                  <td><strong>AI 9대 위험</strong><br><span style="font-size:9.5px;color:var(--text-muted)">통제가능성</span></td>
+                  <td style="font-size:10.5px;">긴급 중단 버튼 구현 및 평균 반응 시간(latency) — 통제 불가 위험 대비 개발</td>
+                  <td><span style="color:var(--risk-low)">Y</span></td>
+                  <td><span style="color:var(--risk-low);font-size:10.5px;">✔</span></td>
+                  <td style="font-size:10px;color:var(--text-muted);">긴급 중단 평균 반응시간 1.2s — 기준 통과</td>
+                  <td style="font-size:9.5px;color:var(--primary)">금융분야 AI 안내서</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 운영단계 -->
+        <div id="tab-ops" style="display:none;">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>구분</th>
+                  <th>대/중구분</th>
+                  <th>평가 문항</th>
+                  <th>결과</th>
+                  <th>AI 검토</th>
+                  <th>모니터링 기준</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="background:#FFF8E1;">
+                  <td class="mono">1.1.1</td>
+                  <td><strong>기본점검</strong><br><span style="font-size:9.5px;color:var(--text-muted)">서비스 재평가</span></td>
+                  <td style="font-size:10.5px;">데이터 드리프트, 규제 변화, 기술 발전 등 재평가 필요성 검토 (재평가 시 기획부터 재수행)</td>
+                  <td><span style="color:var(--risk-mid)">요검토</span></td>
+                  <td><span style="color:var(--risk-mid);font-size:10.5px;">⚠ 보완필요</span></td>
+                  <td style="font-size:10px;color:#856404;">새로운 LLM 모델 상용화 — 업그레이드 필요 검토</td>
+                </tr>
+                <tr>
+                  <td class="mono">2.1.1</td>
+                  <td><strong>AI 9대 위험</strong><br><span style="font-size:9.5px;color:var(--text-muted)">성능</span></td>
+                  <td style="font-size:10.5px;">정기 성능 모니터링 수행 및 변경/개선 이력 관리 — 입력 시나리오 테스트 포함</td>
+                  <td><span style="color:var(--risk-mid)">부분</span></td>
+                  <td><span style="color:var(--risk-mid);font-size:10.5px;">⚠ 보완필요</span></td>
+                  <td style="font-size:10px;color:#856404;">ACC 외 Likert 척도(관련성) 재검증 필요</td>
+                </tr>
+                <tr>
+                  <td class="mono">2.2.1</td>
+                  <td><strong>AI 9대 위험</strong><br><span style="font-size:9.5px;color:var(--text-muted)">공정성</span></td>
+                  <td style="font-size:10.5px;">특정 금융소비자 불합리한 (불)이익 발생 여부 모니터링 (집단별 승인률·거절률 비교)</td>
+                  <td><span style="color:var(--risk-low)">Y</span></td>
+                  <td><span style="color:var(--risk-low);font-size:10.5px;">✔</span></td>
+                  <td style="font-size:10px;color:var(--text-muted);">차별 관련 민원 발생 내역 없음 확인</td>
+                </tr>
+                <tr>
+                  <td class="mono">2.4.1</td>
+                  <td><strong>AI 9대 위험</strong><br><span style="font-size:9.5px;color:var(--text-muted)">데이터보호</span></td>
+                  <td style="font-size:10.5px;">개인정보·비공개 업무자료 유출 지속 모니터링 및 이상 발견 시 점검부서 보고</td>
+                  <td><span style="color:var(--risk-low)">Y</span></td>
+                  <td><span style="color:var(--risk-low);font-size:10.5px;">✔</span></td>
+                  <td style="font-size:10px;color:var(--text-muted);">IT 보안 가이드라인 모니터링 준용 확인</td>
+                </tr>
+                <tr>
+                  <td class="mono">2.7.1</td>
+                  <td><strong>AI 9대 위험</strong><br><span style="font-size:9.5px;color:var(--text-muted)">통제가능성</span></td>
+                  <td style="font-size:10.5px;">인간 개입/중단 절차 마련 및 정상 작동 점검 (고위험 필수)</td>
+                  <td><span style="color:var(--risk-low)">Y</span></td>
+                  <td><span style="color:var(--risk-low);font-size:10.5px;">✔</span></td>
+                  <td style="font-size:10px;color:var(--text-muted);">인간 개입 기능과 절차 마련 확인</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ PAGE: PROCESS ══════════ -->
+    <div class="page" id="page-process">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">AI 위험관리 프로세스 — 수행 주체별 역할 <span class="law-ref">AI 거버넌스 매뉴얼 III장</span></div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>생애주기</th><th>프로세스</th><th>수행 주체</th><th>고위험</th><th>생성형</th></tr>
+              </thead>
+              <tbody>
+                <tr style="background:var(--surface2)"><td colspan="5" style="font-weight:700;font-size:11px;color:var(--primary)">① 기획 단계</td></tr>
+                <tr><td>기획</td><td>1.1 AI 서비스 사업계획 수립</td><td>소관부서(기획)</td><td></td><td></td></tr>
+                <tr><td></td><td>1.2 AI 위험등급 분류</td><td>소관부서(기획)</td><td>●</td><td></td></tr>
+                <tr><td></td><td>1.3 AI 위험평가(기획)</td><td>소관부서(기획)</td><td>●</td><td>●</td></tr>
+                <tr><td></td><td>1.4 AI 위험완화 계획 수립</td><td>소관부서(기획)</td><td>●</td><td>●</td></tr>
+                <tr style="background:var(--surface2)"><td colspan="5" style="font-weight:700;font-size:11px;color:var(--primary)">② 개발 단계</td></tr>
+                <tr><td>개발</td><td>2.1 개발 요건 협의 및 의뢰</td><td>소관부서(기획/개발)</td><td>●</td><td>●</td></tr>
+                <tr style="background:var(--surface2)"><td colspan="5" style="font-weight:700;font-size:11px;color:var(--primary)">③ 평가·검증 단계</td></tr>
+                <tr><td>평가검증</td><td>3.1 개발자 검증</td><td>소관부서(개발)</td><td></td><td></td></tr>
+                <tr><td></td><td style="color:var(--risk-mid);font-weight:600">3.2 제3자 검증 (고위험 필수)</td><td>제3자 검증 담당</td><td>●</td><td></td></tr>
+                <tr><td></td><td>3.5 AI 서비스 운영 통지</td><td>소관부서(기획)</td><td></td><td></td></tr>
+                <tr style="background:var(--surface2)"><td colspan="5" style="font-weight:700;font-size:11px;color:var(--primary)">④ 운영 단계</td></tr>
+                <tr><td>운영</td><td>4.1 AI 서비스 운영 및 개선 활동</td><td>소관부서(서비스/시스템)</td><td></td><td></td></tr>
+                <tr><td></td><td>4.2 AI 위험평가 및 완화(운영)</td><td>소관부서(운영)</td><td>●</td><td>●</td></tr>
+                <tr><td></td><td>4.6 개선활동 및 조치사항 이행</td><td>소관부서(운영)</td><td>●</td><td>●</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="card">
+            <div class="card-title">재평가 트리거 기준</div>
+            <div class="checklist">
+              <div class="check-item warn"><div class="check-box warn">!</div><div class="check-text"><strong>재학습 — 데이터 드리프트</strong><span>운영 환경 입력 분포가 학습 데이터 분포와 달라지는 경우 (소비자 행동변화 등)</span></div></div>
+              <div class="check-item warn"><div class="check-box warn">!</div><div class="check-text"><strong>구조 변경 — 새로운 비즈니스 요구</strong><span>새로운 데이터 처리 유형 또는 서비스 목적 변경</span></div></div>
+              <div class="check-item fail"><div class="check-box fail">!</div><div class="check-text"><strong>사고 — 규제 위반</strong><span>관련 규제 변화로 AI 시스템 재검토 필요</span></div></div>
+              <div class="check-item fail"><div class="check-box fail">!</div><div class="check-text"><strong>사고 — 윤리·사회 문제</strong><span>대규모 민원 발생 또는 언론 보도 등</span></div></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">지원부서 역할 분담</div>
+            <div style="display:flex;flex-direction:column;gap:5px;font-size:11.5px;">
+              <div style="display:flex;justify-content:space-between;padding:5px 8px;background:var(--surface2);border-radius:5px;">
+                <span style="font-weight:600">AI 거버넌스 주관부서</span>
+                <span style="color:var(--text-muted)">결과 검토·승인</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding:5px 8px;background:var(--surface2);border-radius:5px;">
+                <span style="font-weight:600">정보보호부</span>
+                <span style="color:var(--text-muted)">사이버보안·데이터보호 지원</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding:5px 8px;background:var(--surface2);border-radius:5px;">
+                <span style="font-weight:600">금융소비자보호부</span>
+                <span style="color:var(--text-muted)">공정성·소비자 보호 검토</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding:5px 8px;background:var(--surface2);border-radius:5px;">
+                <span style="font-weight:600">준법감시부</span>
+                <span style="color:var(--text-muted)">법령 준수 여부 확인</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding:5px 8px;background:var(--surface2);border-radius:5px;">
+                <span style="font-weight:600">리스크관리부</span>
+                <span style="color:var(--text-muted)">위험관리 지원</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding:5px 8px;background:#FFF3E0;border-radius:5px;border-left:2px solid var(--accent);">
+                <span style="font-weight:600;color:var(--accent)">AI 윤리위원회</span>
+                <span style="color:var(--text-muted)">윤리 이슈 심의·권고</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ PAGE: ORG ══════════ -->
+    <div class="page" id="page-org">
+      <div class="card">
+        <div class="card-title">AI 거버넌스 조직 체계 <span class="law-ref">AI 거버넌스 매뉴얼 II장</span></div>
+        <div style="text-align:center;padding:10px 0;">
+          <div class="org-row">
+            <div class="org-box accent" style="min-width:130px;">🏛️ AI 윤리위원회<br><span style="font-size:9.5px;">심의·조치권고</span></div>
+          </div>
+          <div style="text-align:center;font-size:18px;color:var(--border);margin:4px 0;">↕</div>
+          <div class="org-row">
+            <div class="org-box highlight" style="min-width:160px;">🎯 AI 거버넌스 주관부서<br><span style="font-size:9.5px;">결과 검토·승인·조율</span></div>
+          </div>
+          <div style="text-align:center;font-size:18px;color:var(--border);margin:4px 0;">↕</div>
+          <div class="org-row">
+            <div class="org-box" style="min-width:120px;">📋 소관부서<br>(기획/서비스운영)<br><span style="font-size:9.5px;">1.기획 · 4.운영</span></div>
+            <div class="org-box" style="min-width:120px;">💻 소관부서<br>(개발/시스템운영)<br><span style="font-size:9.5px;">2.개발 · 3.평가검증</span></div>
+            <div class="org-box" style="min-width:120px;">🔍 제3자 검증 담당<br><span style="font-size:9.5px;">고위험 시 필수</span></div>
+          </div>
+          <div style="text-align:center;font-size:18px;color:var(--border);margin:4px 0;">↕</div>
+          <div class="org-row">
+            <div class="org-box" style="min-width:90px;">🛡️ 정보보호부</div>
+            <div class="org-box" style="min-width:90px;">👥 소비자보호부</div>
+            <div class="org-box" style="min-width:90px;">⚖️ 준법감시부</div>
+            <div class="org-box" style="min-width:90px;">📊 리스크관리부</div>
+          </div>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">AI 거버넌스 기본원칙 <span class="law-ref">AI 거버넌스 매뉴얼 II-1</span></div>
+          <div class="checklist">
+            <div class="check-item done"><div class="check-box done">1</div><div class="check-text"><strong>신뢰성 제고</strong><span>AI 서비스 생애주기 전 과정에서 신뢰성을 제고하여 고객 신뢰 확보</span></div></div>
+            <div class="check-item done"><div class="check-box done">2</div><div class="check-text"><strong>역할·책임 명확화</strong><span>AI 위험을 평가·관리하기 위한 구성원의 역할·권한·책임을 전 과정에 걸쳐 정의</span></div></div>
+            <div class="check-item done"><div class="check-box done">3</div><div class="check-text"><strong>AI 위험관리정책 수립</strong><span>잠재적 AI 위험을 인식·평가하고 관리·최소화하는 방안 검토</span></div></div>
+            <div class="check-item done"><div class="check-box done">4</div><div class="check-text"><strong>AI 기본법 등 법령 준수</strong><span>AI 서비스 개발·활용과 관련된 법령상 의무를 충실하게 이행</span></div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">용어 정의 — 핵심 개념</div>
+          <div style="display:flex;flex-direction:column;gap:5px;font-size:11px;">
+            <div style="padding:6px 9px;background:var(--surface2);border-radius:5px;"><strong>AI 생애주기:</strong> <span style="color:var(--text-muted)">기획 → 개발 → 평가검증 → 운영모니터링 → 활용·종료</span></div>
+            <div style="padding:6px 9px;background:var(--surface2);border-radius:5px;"><strong>고영향 AI:</strong> <span style="color:var(--text-muted)">사람의 생명·신체·기본권에 중대 영향 — AI기본법 제2조 제4호 영역</span></div>
+            <div style="padding:6px 9px;background:var(--surface2);border-radius:5px;"><strong>고성능 AI:</strong> <span style="color:var(--text-muted)">학습 누적 연산량 10^26 FLOPs 이상의 AI 시스템</span></div>
+            <div style="padding:6px 9px;background:var(--surface2);border-radius:5px;"><strong>제3자 검증:</strong> <span style="color:var(--text-muted)">기획·개발·운영 담당 외 독립 조직 또는 외부 AI 검인증 기관</span></div>
+            <div style="padding:6px 9px;background:var(--surface2);border-radius:5px;"><strong>지원부서:</strong> <span style="color:var(--text-muted)">내부통제·위험관리·법규 준수를 지원하는 부서 (정보보호, 준법감시 등)</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ PAGE: MONITOR ══════════ -->
+    <div class="page" id="page-monitor">
+      <div class="grid-4">
+        <div class="stat-card green"><div class="stat-label">정상 운영</div><div class="stat-value">21</div><div class="stat-sub">실시간 모니터링 중</div></div>
+        <div class="stat-card orange"><div class="stat-label">재평가 필요</div><div class="stat-value">2</div><div class="stat-sub">재학습·구조변경 트리거</div></div>
+        <div class="stat-card red"><div class="stat-label">보완 조치 필요</div><div class="stat-value">1</div><div class="stat-sub">채용 AI 사전고지 미비</div></div>
+        <div class="stat-card"><div class="stat-label">오늘 AI 판단 건수</div><div class="stat-value">18,412</div><div class="stat-sub">자동처리 99.1%</div></div>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">📡 운영 단계 모니터링 현황 <span class="law-ref">위험평가 체크리스트 운영단계</span></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>서비스명</th><th>성능</th><th>공정성</th><th>드리프트</th><th>HITL 작동</th><th>상태</th></tr></thead>
+              <tbody>
+                <tr><td>iM 신용평가 AI</td><td><span class="mono">94.2%</span></td><td><span style="color:var(--risk-low)">이상없음</span></td><td><span style="color:var(--risk-low)">정상</span></td><td>🟢 정상</td><td>🟢 운영</td></tr>
+                <tr><td>iM 챗봇 AI</td><td><span class="mono">96.5%</span></td><td><span style="color:var(--risk-low)">이상없음</span></td><td><span style="color:var(--risk-low)">정상</span></td><td>—</td><td>🟢 운영</td></tr>
+                <tr><td>마케팅 개인화 AI</td><td><span class="mono">89.1%</span></td><td><span style="color:var(--risk-mid)">⚠ 주의</span></td><td><span style="color:var(--risk-mid)">주의</span></td><td>—</td><td>🟡 주의</td></tr>
+                <tr><td>채용 스크리닝 AI</td><td><span class="mono">91.8%</span></td><td><span style="color:var(--risk-low)">이상없음</span></td><td><span style="color:var(--risk-low)">정상</span></td><td>🟢 정상</td><td>🔴 보완중</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">📋 최근 이상 감지 이력</div>
+          <div class="timeline">
+            <div class="tl-item">
+              <div class="tl-dot" style="background:#FDECEA;color:var(--risk-high)">⚠</div>
+              <div class="tl-content">
+                <div class="tl-date">2025-03-26 09:14</div>
+                <div class="tl-title">채용 AI — 사전 고지 문구 미비 (AI기본법 제31조)</div>
+                <div class="tl-desc">고영향 AI 투명성 의무 위반 소지 — 즉시 보완 필요</div>
+              </div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-dot" style="background:#FFF8E1;color:var(--risk-mid)">!</div>
+              <div class="tl-content">
+                <div class="tl-date">2025-03-25 16:42</div>
+                <div class="tl-title">마케팅 AI — 특정 연령층 추천 편향 가능성 감지</div>
+                <div class="tl-desc">공정성 지표(Bias Score) 임계치 접근 — 재검토 예정</div>
+              </div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-dot" style="background:#E6FAF5;color:var(--risk-low)">✓</div>
+              <div class="tl-content">
+                <div class="tl-date">2025-03-24 11:00</div>
+                <div class="tl-title">iM 신용평가 AI — 정기 성능 점검 통과</div>
+                <div class="tl-desc">월간 정기 검토 이상 없음, HITL 절차 정상 작동 확인</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ PAGE: AUDIT ══════════ -->
+    <div class="page" id="page-audit">
+      <div class="card">
+        <div class="card-title">🗂️ 감사 이력 <span class="law-ref">AI 거버넌스 매뉴얼 III장</span></div>
+        <div class="timeline">
+          <div class="tl-item">
+            <div class="tl-dot" style="background:#FDECEA;color:var(--risk-high)">⚠</div>
+            <div class="tl-content">
+              <div class="tl-date">2025-03-26</div>
+              <div class="tl-title">채용 스크리닝 AI — 기획단계 위험평가 보완 필요</div>
+              <div class="tl-desc">2.5.1 사전 고지·표시 항목 미비 — AI기본법 제31조 위반 소지 / 보완 후 재심사 예정</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot" style="background:#E6FAF5;color:var(--risk-low)">✓</div>
+            <div class="tl-content">
+              <div class="tl-date">2025-03-15</div>
+              <div class="tl-title">iM 챗봇 AI — 운영단계 위험평가 전 항목 통과</div>
+              <div class="tl-desc">생성형 AI 투명성 의무 이행, 유해성 모니터링 정상, 워터마크 표시 확인 / 준법감시부 승인</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot" style="background:#FFF8E1;color:var(--risk-mid)">!</div>
+            <div class="tl-content">
+              <div class="tl-date">2025-02-28</div>
+              <div class="tl-title">마케팅 AI — 공정성 모니터링 주의 등급</div>
+              <div class="tl-desc">PSI 0.22 — 임계치(0.25) 접근, 편향 완화 조치 검토 중 / 금융소비자보호부 확인 예정</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot" style="background:#E6FAF5;color:var(--risk-low)">✓</div>
+            <div class="tl-content">
+              <div class="tl-date">2025-01-10</div>
+              <div class="tl-title">iM 신용평가 AI — 개발단계 위험평가 승인</div>
+              <div class="tl-desc">제3자 검증 완료, SHAP 설명가능성 적용, 긴급 중단 반응시간 1.2s 확인 / AI 거버넌스 주관부서 승인</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ PAGE: AI ASSISTANT ══════════ -->
+    <div class="page" id="page-ai-assistant">
+      <div class="grid-60-40">
+        <div class="ai-panel">
+          <div class="ai-panel-title">🤖 AI 거버넌스 어시스턴트 <span class="ai-badge">CLAUDE</span></div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.5);margin-bottom:10px;">AI기본법·금융분야 AI 안내서·iM 거버넌스 매뉴얼 기반</div>
+          <div class="ai-messages" id="chat-messages">
+            <div class="ai-msg assistant">
+              <div class="msg-label">AI 거버넌스 어시스턴트</div>
+              안녕하세요! iM 금융그룹 AI 거버넌스 어시스턴트입니다.<br>
+              <strong>AI기본법</strong> 및 <strong>SDS·김앤장 컨소시엄 산출물</strong> 기반으로 기획·개발·운영 3단계 위험평가를 자동화합니다.<br>
+              <br>어떤 AI 서비스의 거버넌스를 지원해드릴까요?
+            </div>
+          </div>
+          <div class="ai-input-row">
+            <input class="ai-input" id="chat-input" placeholder="예: 대출심사 AI 기획단계 체크리스트 생성해줘" onkeydown="if(event.key==='Enter')sendChat()">
+            <button class="ai-send" onclick="sendChat()">→</button>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="card">
+            <div class="card-title">⚡ 빠른 작업</div>
+            <div style="display:flex;flex-direction:column;gap:5px;">
+              <button class="btn btn-outline" style="text-align:left;font-size:11px;" onclick="quickChat('AI 서비스 여부 판단 및 위험등급 자동산정')">🔎 AI 서비스 여부 · 위험등급 자동 판단</button>
+              <button class="btn btn-outline" style="text-align:left;font-size:11px;" onclick="quickChat('고위험 AI 기획단계 체크리스트 생성')">📋 고위험 AI 기획단계 체크리스트 생성</button>
+              <button class="btn btn-outline" style="text-align:left;font-size:11px;" onclick="quickChat('개발단계 공정성 검토 기준 안내')">⚖️ 개발단계 공정성 · 편향성 검토</button>
+              <button class="btn btn-outline" style="text-align:left;font-size:11px;" onclick="quickChat('AI기본법 제31조 투명성 의무 가이드')">📖 AI기본법 제31조 투명성 의무 안내</button>
+              <button class="btn btn-outline" style="text-align:left;font-size:11px;" onclick="quickChat('운영단계 재평가 트리거 점검')">🔄 운영단계 재평가 트리거 점검</button>
+              <button class="btn btn-outline" style="text-align:left;font-size:11px;" onclick="quickChat('AI 위험완화 계획서 초안 자동 작성')">📄 AI 위험완화 계획서 초안 작성</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">💡 AI가 자동화하는 업무</div>
+            <div style="font-size:11.5px;line-height:2.0;color:var(--text);">
+              ✅ AI 서비스 여부 4요건 자동 판단<br>
+              ✅ 고영향AI·생성형AI 위험등급 자동 분류<br>
+              ✅ 기획·개발·운영 3단계 체크리스트 생성<br>
+              ✅ 보완 필요 항목 자동 식별·의견서 초안<br>
+              ✅ AI 9대 위험 기준 자동 매핑<br>
+              ✅ 법령(AI기본법·신용정보법·개인정보보호법) 연계<br>
+              <span style="color:var(--text-muted);font-size:10.5px;">→ 2인 이상 인력 투입 없이 AI가 1차 검토 완료!</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const pages = {
+  'dashboard':   { title:'거버넌스 대시보드', breadcrumb:'홈 / 대시보드' },
+  'ai-check':    { title:'AI 서비스 여부 판단', breadcrumb:'홈 / AI 서비스 판단' },
+  'risk-grade':  { title:'AI 위험등급 분류', breadcrumb:'홈 / 위험등급 분류' },
+  'checklist':   { title:'위험평가 체크리스트', breadcrumb:'홈 / 체크리스트' },
+  'process':     { title:'AI 위험관리 프로세스', breadcrumb:'홈 / 프로세스' },
+  'org':         { title:'조직 · 역할', breadcrumb:'홈 / 거버넌스 관리 / 조직' },
+  'monitor':     { title:'실시간 모니터링', breadcrumb:'홈 / 거버넌스 관리 / 모니터링' },
+  'audit':       { title:'감사 이력', breadcrumb:'홈 / 거버넌스 관리 / 감사' },
+  'ai-assistant':{ title:'AI 거버넌스 어시스턴트', breadcrumb:'홈 / AI 어시스턴트' },
+};
+
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if (n.getAttribute('onclick') && n.getAttribute('onclick').includes("'" + id + "'")) n.classList.add('active');
+  });
+  document.getElementById('page-title').textContent = pages[id]?.title || id;
+  document.getElementById('page-breadcrumb').textContent = pages[id]?.breadcrumb || '';
+}
+
+function switchTab(el, tabId) {
+  el.parentElement.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-planning').style.display='none';
+  document.getElementById('tab-dev').style.display='none';
+  document.getElementById('tab-ops').style.display='none';
+  document.getElementById(tabId).style.display='block';
+}
+
+const responses = {
+  'AI 서비스 여부 판단 및 위험등급 자동산정':
+    '【AI 서비스 여부 판단 및 위험등급 자동 산정】\n\n✅ 판단 결과: AI 서비스에 해당\n→ 자율성·적응성·추론기반 결과물·활용성 4요건 모두 충족\n\n📊 위험등급 분류:\n• 개인 대상 + 대출심사 업무 → 고영향 AI 해당\n• AI기본법 제34조 사업자 책무 적용\n• 등급: 🔴 고위험\n\n→ 기획단계 체크리스트 생성을 진행하시겠습니까?',
+  '고위험 AI 기획단계 체크리스트 생성':
+    '【고위험 AI 기획단계 체크리스트 자동 생성】\n\n필수 평가 항목 (총 11개):\n\n✅ 1.1.1 윤리원칙 부합 여부\n✅ 2.1.1 위험관리방안 수립 (AI기본법 제34조①1호)\n✅ 2.2.1 이용자 보호 방안 수립 (제34조①3호)\n✅ 2.3.1 관리·감독 부서 지정 및 홈페이지 게시\n⚠️ 2.4.1 설명 제공 방안 (XAI 적용 검토)\n⚠️ 2.5.1 AI 운용 사실 사전 고지 방안 (제31조①)\n✅ 4.1.1 공정성 지표 선정 (금소법 제15조 차별금지)\n✅ 4.2.1 유해성 사전 확인\n⚠️ 4.3.1 제3자 위험 (업무위수탁 체크리스트)\n✅ 4.4.1 통제가능성 (HITL 기준·절차 정의)\n\n📋 AI 위험완화 계획서 양식 자동 생성 완료',
+  '개발단계 공정성 · 편향성 검토':
+    '【개발단계 공정성·편향성 검토 기준】\n\n📐 비생성형 AI 기준:\n• PSI (Population Stability Index) ≥ 0.25 → Y\n• Fairness Tree (FOR 기반) ≥ 0.2 (4/5 Rule) → Y\n\n📐 생성형 AI 기준:\n• KL Divergence ≥ 0.2 (4/5 Rule) → Y\n• Bias Score: LLM 리더보드 타 모델 비교\n\n🔧 편향 완화 방법:\n• CDA (Counterfactual Data Augmentation)\n• Adversarial Debiasing\n• 데이터 가공 또는 모델 재학습\n\n참고: AI 평가검증 안내서 기준 적용 권장',
+  'AI기본법 제31조 투명성 의무 안내':
+    '【AI기본법 제31조 투명성 의무 요약】\n\n생성형 AI 및 고영향 AI는 이용자에게 반드시 고지해야 합니다.\n\n📌 적용 대상:\n• 생성형 AI (글·소리·그림·영상 생성)\n• 고영향 AI (채용·대출심사 등)\n\n📌 고지 방법:\n• 계약서, 이용약관, 화면 표시 등\n• 워터마크 추가 (생성형 결과물)\n\n🚫 면제 사유 (시행령 제22조④):\n• AI 기반임이 명백한 경우\n• 내부 업무 전용\n\n⚠️ 현재 채용 AI의 고지 문구 불충분 → 즉시 보완 권고',
+  '운영단계 재평가 트리거 점검':
+    '【운영단계 재평가 트리거 점검 결과】\n\n현재 재평가 필요 서비스:\n\n🟡 마케팅 개인화 AI\n• 데이터 드리프트 감지 (PSI 임계치 접근)\n→ 소비자 행동패턴 변화 가능성 확인 필요\n\n🟡 iM 신용평가 AI (LLM 업그레이드 검토)\n• 새로운 LLM 모델 상용화 → 모델 업그레이드 적합성 평가 권고\n→ 구조 변경 트리거 해당\n\n✅ 기타 서비스: 재평가 불필요\n\n재평가 수행 시: 위험등급 분류부터 위험관리 프로세스 재수행',
+  'AI 위험완화 계획서 초안 자동 작성':
+    '【AI 위험완화 계획서 초안 — iM 신용평가 AI】\n\n서비스: iM 신용평가 AI | 위험등급: 고위험\n단계: 기획 | 작성일: 2025.03.26\n\n1. 위험 완화 항목\n• 사전 고지 문구: "본 심사 결과는 AI 기반 신용평가 시스템에 의해 산출됩니다"\n• XAI 적용: SHAP을 활용한 주요 영향요인 설명 기능 구현\n• HITL 절차: AI 결과 이상 시 담당자 수동 검토 → 재산출 절차 수립\n• 공정성 지표: Bias Score(편향성) + PSI 정기 모니터링\n\n2. 관련 법령: AI기본법 제31조·제34조, 신용정보법 제36조의2\n\n3. 이행 일정: 개발 착수 전 완료 목표\n\n📄 AI 거버넌스 주관부서 검토 요청 발송 완료',
+};
+
+function sendChat() {
+  const input = document.getElementById('chat-input');
+  const msg = input.value.trim();
+  if (!msg) return;
+  addMessage(msg, 'user');
+  input.value = '';
+  setTimeout(() => {
+    const reply = responses[msg] || '해당 질문을 분석 중입니다.\n\nAI기본법, 금융분야 AI 개발·활용 안내서, iM AI 거버넌스 매뉴얼을 기반으로 관련 체크리스트와 검토 의견을 생성해드리겠습니다. 구체적인 서비스명과 위험등급을 알려주시면 더 정확한 결과를 드릴 수 있습니다.';
+    addMessage(reply, 'assistant');
+  }, 600);
+}
+
+function quickChat(msg) {
+  showPage('ai-assistant');
+  setTimeout(() => {
+    document.getElementById('chat-input').value = msg;
+    sendChat();
+  }, 100);
+}
+
+function addMessage(text, role) {
+  const el = document.createElement('div');
+  el.className = 'ai-msg ' + role;
+  el.innerHTML = '<div class="msg-label">' + (role === 'user' ? '담당자' : 'AI 어시스턴트') + '</div>' + text.replace(/\n/g,'<br>');
+  const msgs = document.getElementById('chat-messages');
+  msgs.appendChild(el);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+</script>
+</body>
+</html>
